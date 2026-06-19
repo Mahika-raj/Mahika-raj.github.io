@@ -1,0 +1,1645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mahika Raj</title>
+  <!-- Real uploaded Sweezy .ani cursor used through extracted animated frames. -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Butterfly+Kids&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg:        #ffffff;
+      --ink:       #111111;
+      --home-bg:   #0e0e0e;
+      --home-text: #ffffff;
+      --hand: "Butterfly Kids", cursive;
+      --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --panel-w: clamp(340px, 50vw, 520px);
+      --name-size: clamp(48px, 12vw, 110px);
+      --soft-ease: cubic-bezier(.25, .8, .25, 1);
+
+      /* pixel-art cursor (hotspot at the tip: 6 1) */
+      --cursor: none;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; cursor: var(--cursor); }
+    html, body { height: 100%; background: var(--home-bg); overflow: hidden; }
+
+    .reveal-wrap {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      pointer-events: none;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    #home {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: var(--home-bg);
+      opacity: 0;
+      transition: opacity 720ms cubic-bezier(.16,1,.3,1);
+    }
+    #home.settled { opacity: 1; }
+
+    #codeScreen {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--mono);
+      transition:
+        background-color 2300ms cubic-bezier(.16, 1, .3, 1),
+        color 2300ms cubic-bezier(.16, 1, .3, 1);
+    }
+    #codeScreen.dark {
+      background: var(--home-bg);
+      color: var(--home-text);
+    }
+
+    /* ===================== UNIFIED LOADING + TERMINAL ===================== */
+    #loader {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      transition:
+        opacity 720ms cubic-bezier(.16,1,.3,1),
+        transform 720ms cubic-bezier(.16,1,.3,1),
+        filter 720ms cubic-bezier(.16,1,.3,1);
+    }
+    #loader.hide {
+      opacity: 0;
+      transform: none;
+      filter: blur(3px);
+      pointer-events: none;
+    }
+
+    .stage {
+      position: relative;
+      width: min(var(--panel-w), calc(100vw - 42px));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .loading {
+      position: absolute;
+      right: clamp(10px, 2vw, 20px);
+      bottom: calc(100% + 7px);
+      white-space: nowrap;
+      font-family: var(--hand);
+      color: var(--ink);
+      font-size: clamp(44px, 8.2vw, 64px);
+      line-height: .86;
+      transform: rotate(-2deg);
+      z-index: 2;
+    }
+
+    .terminal-loader {
+      width: 100%;
+      min-height: 194px;
+      border: 2.5px solid var(--ink);
+      border-radius: 24px;
+      padding: 21px 24px 23px;
+      background: rgba(255,255,255,.90);
+      box-shadow: 10px 10px 0 rgba(17,17,17,.92);
+      filter: url(#rough);
+    }
+
+    .terminal-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .dot {
+      width: 9px;
+      height: 9px;
+      border: 1.5px solid var(--ink);
+      border-radius: 999px;
+      background: var(--bg);
+    }
+    .terminal-title {
+      margin-left: 7px;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .02em;
+      opacity: .55;
+      filter: none;
+    }
+
+    .cmd-stack { min-height: 76px; }
+
+    /* NPM text popup copied from the 9_code_jump code-line behavior. */
+    .cmd-line {
+      display: block;
+      font-family: var(--mono);
+      font-size: clamp(13px, 1.55vw, 15px);
+      line-height: 1.7;
+      white-space: nowrap;
+      opacity: 0;
+      transform: translateY(5px);
+      transition:
+        opacity 750ms ease,
+        transform 750ms cubic-bezier(.22,1,.36,1);
+    }
+    .cmd-line.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .muted { opacity: .55; }
+    .ok { font-weight: 700; }
+
+    .bar { position: relative; width: 100%; height: 34px; margin-top: 12px; }
+    .outline {
+      position: absolute; inset: 0;
+      border: 2.5px solid var(--ink);
+      border-radius: 999px;
+    }
+    .inner {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+    }
+    .segs {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .seg {
+      flex: 1;
+      height: 18px;
+      background: transparent;
+      border-radius: 4px;
+      transform: rotate(var(--r)) scaleY(.82);
+      transform-origin: center;
+      transition:
+        background-color 190ms ease,
+        transform 420ms cubic-bezier(.16,1,.3,1);
+    }
+    .seg.on {
+      background: var(--ink);
+      transform: rotate(var(--r)) scaleY(1.04);
+    }
+
+
+
+    /* ===================== SOFTER WHITE -> BLACK CROSSFADE ===================== */
+    /* Instead of changing the whole screen color at once, a black layer fades in
+       over the white code screen. This removes the flash/pop between loader and rain. */
+    #codeScreen {
+      isolation: isolate;
+      background: var(--bg) !important;
+      transition: color 3200ms cubic-bezier(.16, 1, .3, 1) !important;
+    }
+    #codeScreen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background: var(--home-bg);
+      opacity: 0;
+      transition: opacity 3200ms cubic-bezier(.16, 1, .3, 1);
+      pointer-events: none;
+    }
+    #codeScreen.dark {
+      background: var(--bg) !important;
+      color: var(--home-text);
+    }
+    #codeScreen.dark::before {
+      opacity: 1;
+    }
+    #codeScreen > * {
+      z-index: 1;
+    }
+
+    /* ===================== CODE FIELD ===================== */
+    .code-lane {
+      position: absolute;
+      left: -44vw;
+      width: 188vw;
+      top: var(--y);
+      display: flex;
+      gap: clamp(28px, 4.7vw, 70px);
+      align-items: center;
+      font-family: var(--mono);
+      font-size: clamp(10px, 1.2vw, 13px);
+      line-height: 1;
+      white-space: nowrap;
+      color: rgba(17,17,17,.20);
+      opacity: 0;
+      transform: translate3d(var(--start-x), 0, 0);
+      filter: blur(2px);
+      transition:
+        opacity 760ms cubic-bezier(.16, 1, .3, 1),
+        color 2300ms cubic-bezier(.16, 1, .3, 1),
+        filter 760ms cubic-bezier(.16, 1, .3, 1);
+      animation: laneSlide var(--dur) linear var(--delay) infinite;
+      will-change: transform, opacity, color;
+    }
+    #codeScreen.dark .code-lane { color: rgba(255,255,255,.28); }
+    .code-lane.show { opacity: var(--alpha); filter: blur(0); }
+    .code-lane.focus {
+      opacity: .42;
+      filter: blur(.65px);
+      transition:
+        opacity 760ms cubic-bezier(.16,1,.3,1),
+        filter 760ms cubic-bezier(.16,1,.3,1);
+    }
+    .code-lane.fade {
+      opacity: 0;
+      filter: blur(4px);
+      transition:
+        opacity 900ms cubic-bezier(.16, 1, .3, 1),
+        filter 900ms cubic-bezier(.16, 1, .3, 1);
+    }
+    .code-pill { display: inline-block; opacity: .9; }
+
+    @keyframes laneSlide {
+      from { transform: translate3d(var(--start-x), 0, 0); }
+      to   { transform: translate3d(var(--end-x), 0, 0); }
+    }
+
+    /* ===================== SMOOTHER NAME COMPILE ===================== */
+    .name-assembly {
+      position: fixed;
+      inset: 0;
+      z-index: 24;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      transform: none;
+      filter: blur(8px);
+      transition:
+        opacity 780ms cubic-bezier(.16,1,.3,1),
+        transform 780ms cubic-bezier(.16,1,.3,1),
+        filter 780ms cubic-bezier(.16,1,.3,1);
+    }
+    .name-assembly.show {
+      opacity: 1;
+      transform: none;
+      filter: blur(0);
+    }
+    .name-assembly.resolve {
+      opacity: 0;
+      transform: none;
+      filter: blur(4px);
+      transition:
+        opacity 720ms cubic-bezier(.16,1,.3,1),
+        transform 720ms cubic-bezier(.16,1,.3,1),
+        filter 720ms cubic-bezier(.16,1,.3,1);
+    }
+
+    .compile-wrap {
+      position: relative;
+      width: max-content;
+      max-width: calc(100vw - 24px);
+      padding: 0 10px;
+      display: grid;
+      place-items: center;
+      isolation: isolate;
+    }
+
+    .source-band {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: min(740px, calc(100vw - 44px));
+      height: clamp(60px, 8vw, 86px);
+      transform: translate(-50%, -50%) scaleX(.70);
+      opacity: 0;
+      overflow: hidden;
+      border-top: 1px solid rgba(255,255,255,.12);
+      border-bottom: 1px solid rgba(255,255,255,.12);
+      mask-image: linear-gradient(90deg, transparent, #000 16%, #000 84%, transparent);
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 16%, #000 84%, transparent);
+      transition:
+        opacity 700ms cubic-bezier(.16,1,.3,1),
+        transform 900ms cubic-bezier(.16,1,.3,1),
+        height 900ms cubic-bezier(.16,1,.3,1);
+      z-index: -1;
+    }
+    .source-band span {
+      position: absolute;
+      left: -25%;
+      width: 150%;
+      font-family: var(--mono);
+      font-size: clamp(9px, .95vw, 12px);
+      letter-spacing: .08em;
+      color: rgba(255,255,255,.38);
+      white-space: nowrap;
+      animation: bandSlide var(--speed) linear var(--delay) infinite;
+    }
+    .source-band span:nth-child(1) { top: 8px;  --speed: 9600ms;  --delay: -2600ms; }
+    .source-band span:nth-child(2) { top: 29px; --speed: 11600ms; --delay: -5400ms; opacity: .72; }
+    .source-band span:nth-child(3) { top: 50px; --speed: 10400ms; --delay: -1200ms; opacity: .54; }
+
+    .name-assembly.show .source-band {
+      opacity: .92;
+      transform: translate(-50%, -50%) scaleX(1);
+      height: clamp(70px, 8.8vw, 94px);
+    }
+    .name-assembly.lock .source-band {
+      opacity: 0;
+      transform: translate(-50%, -50%) scaleX(.58);
+      height: 2px;
+      transition:
+        opacity 720ms cubic-bezier(.16,1,.3,1),
+        transform 720ms cubic-bezier(.16,1,.3,1),
+        height 720ms cubic-bezier(.16,1,.3,1);
+    }
+
+    @keyframes bandSlide {
+      from { transform: translateX(0); }
+      to   { transform: translateX(28%); }
+    }
+
+    .compiled-name {
+      position: relative;
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      font-family: var(--hand);
+      font-size: var(--name-size);
+      line-height: 1;
+      white-space: nowrap;
+      text-shadow: none;
+    }
+
+    .glyph {
+      position: relative;
+      display: inline-block;
+      color: rgba(255,255,255,0);
+      opacity: 0;
+      transform: none;
+      filter: blur(10px);
+      animation: none;
+      will-change: opacity, filter, color;
+    }
+    .glyph.space { width: .28em; }
+
+    .glyph::before {
+      content: attr(data-char);
+      position: absolute;
+      inset: 0;
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      background-image:
+        repeating-linear-gradient(
+          0deg,
+          rgba(255,255,255,.98) 0 2px,
+          rgba(255,255,255,.34) 2px 4px,
+          transparent 4px 7px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          rgba(255,255,255,.72) 0 8px,
+          rgba(255,255,255,.22) 8px 13px,
+          transparent 13px 18px
+        );
+      background-size: 100% 15px, 260px 100%;
+      background-position: 0 0, 0 0;
+      clip-path: inset(100% 0 0 0);
+      opacity: .94;
+      filter: none;
+      animation: codeTexture 900ms linear infinite;
+      pointer-events: none;
+    }
+
+    .glyph::after {
+      content: attr(data-char);
+      position: absolute;
+      inset: 0;
+      color: rgba(255,255,255,.98);
+      opacity: 0;
+      transform: none;
+      filter: blur(4px);
+      pointer-events: none;
+    }
+
+    .name-assembly.show .glyph {
+      animation: glyphRise 1280ms cubic-bezier(.16,1,.3,1) forwards;
+      animation-delay: calc(70ms * var(--i));
+    }
+    .name-assembly.show .glyph::before {
+      animation:
+        codeTexture 900ms linear infinite,
+        glyphCodeReveal 1180ms cubic-bezier(.16,1,.3,1) forwards;
+      animation-delay: 0ms, calc(70ms * var(--i));
+    }
+    .name-assembly.lock .glyph::before {
+      opacity: 0;
+      clip-path: inset(0 0 0 0);
+      transition: opacity 740ms cubic-bezier(.16,1,.3,1);
+    }
+    .name-assembly.lock .glyph::after {
+      opacity: 1;
+      transform: none;
+      filter: blur(0);
+      transition:
+        opacity 800ms cubic-bezier(.16,1,.3,1),
+        filter 800ms cubic-bezier(.16,1,.3,1);
+    }
+
+    .compile-sweep {
+      position: absolute;
+      left: -6%;
+      right: -6%;
+      top: 50%;
+      height: 2px;
+      transform: translateY(-50%) scaleX(0);
+      transform-origin: left center;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.62), transparent);
+      opacity: 0;
+      filter: blur(.2px);
+      z-index: 2;
+    }
+    .name-assembly.show .compile-sweep {
+      animation: sweepLine 1500ms cubic-bezier(.16,1,.3,1) 260ms forwards;
+    }
+
+    @keyframes glyphRise {
+      0%   { opacity: 0; transform: scale(.965); filter: blur(10px); color: rgba(255,255,255,0); }
+      45%  { opacity: .86; filter: blur(3px); }
+      100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); color: rgba(255,255,255,.08); }
+    }
+    @keyframes glyphCodeReveal {
+      0%   { clip-path: inset(100% 0 0 0); opacity: 0; }
+      22%  { opacity: 1; }
+      100% { clip-path: inset(0 0 0 0); opacity: .94; }
+    }
+    @keyframes codeTexture {
+      from { background-position: 0 0, 0 0; }
+      to   { background-position: 0 15px, 260px 0; }
+    }
+    @keyframes sweepLine {
+      0%   { transform: translateY(-50%) scaleX(0); opacity: 0; }
+      18%  { opacity: 1; }
+      72%  { opacity: .85; }
+      100% { transform: translateY(-50%) scaleX(1); opacity: 0; }
+    }
+
+
+
+    /* ===================== ULTRA SMOOTH NAME REVEAL OVERRIDES ===================== */
+    #home {
+      transition: opacity 850ms var(--soft-ease);
+    }
+
+    #codeScreen {
+      transition:
+        background-color 2300ms var(--soft-ease),
+        color 2300ms var(--soft-ease);
+    }
+
+    #loader {
+      transition:
+        opacity 650ms var(--soft-ease),
+        filter 650ms var(--soft-ease);
+    }
+    #loader.hide {
+      transform: none;
+      filter: blur(2px);
+    }
+
+    .code-lane {
+      transition:
+        opacity 760ms var(--soft-ease),
+        color 2300ms var(--soft-ease),
+        filter 760ms var(--soft-ease);
+    }
+    .code-lane.focus {
+      opacity: .36;
+      filter: blur(.45px);
+      transition:
+        opacity 850ms var(--soft-ease),
+        filter 850ms var(--soft-ease);
+    }
+    .code-lane.fade {
+      opacity: 0;
+      filter: blur(3px);
+      transition:
+        opacity 900ms var(--soft-ease),
+        filter 900ms var(--soft-ease);
+    }
+
+    .name-assembly {
+      filter: blur(7px);
+      transition:
+        opacity 800ms var(--soft-ease),
+        filter 800ms var(--soft-ease);
+    }
+    .name-assembly.resolve {
+      filter: blur(3px);
+      transition:
+        opacity 760ms var(--soft-ease),
+        filter 760ms var(--soft-ease);
+    }
+    .name-assembly.lock .source-band {
+      opacity: 0;
+      transform: translate(-50%, -50%) scaleX(.88);
+      height: 2px;
+      transition:
+        opacity 760ms var(--soft-ease),
+        transform 760ms var(--soft-ease),
+        height 760ms var(--soft-ease);
+    }
+
+    .smooth-name {
+      position: relative;
+      display: grid;
+      transform: none !important;
+      scale: 1 !important;
+      place-items: center;
+      font-family: var(--hand);
+      font-size: var(--name-size);
+      line-height: 1;
+      white-space: nowrap;
+      text-shadow: none;
+      isolation: isolate;
+    }
+
+    .smooth-name-layer,
+    .smooth-name-layer::before {
+      grid-area: 1 / 1;
+      display: block;
+      white-space: nowrap;
+    }
+
+    .name-ghost {
+      color: rgba(255,255,255,.10);
+      -webkit-text-stroke: .45px rgba(255,255,255,.18);
+      opacity: 0;
+      filter: blur(10px);
+      transition:
+        opacity 850ms var(--soft-ease),
+        filter 850ms var(--soft-ease);
+    }
+
+    .name-code-fill,
+    .name-final-fill,
+    .name-sheen {
+      color: transparent;
+    }
+
+    .name-code-fill::before,
+    .name-final-fill::before,
+    .name-sheen::before {
+      content: attr(data-text);
+    }
+
+    .name-code-fill::before {
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      background-image:
+        repeating-linear-gradient(
+          0deg,
+          rgba(255,255,255,.98) 0 2px,
+          rgba(255,255,255,.42) 2px 4px,
+          transparent 4px 8px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          rgba(255,255,255,.78) 0 9px,
+          rgba(255,255,255,.24) 9px 15px,
+          transparent 15px 21px
+        );
+      background-size: 100% 18px, 280px 100%;
+      background-position: 0 0, 0 0;
+      opacity: 0;
+      filter: blur(4px);
+      clip-path: inset(0 100% 0 0);
+      animation: codeTextureSmooth 1200ms linear infinite;
+      transition:
+        clip-path 1050ms var(--soft-ease),
+        opacity 850ms var(--soft-ease),
+        filter 760ms var(--soft-ease);
+    }
+
+    .name-final-fill::before {
+      color: rgba(255,255,255,.98);
+      opacity: 0;
+      filter: blur(4px);
+      text-shadow: none;
+      transition:
+        opacity 780ms var(--soft-ease),
+        filter 780ms var(--soft-ease);
+    }
+
+    .name-sheen::before {
+      display: none;
+      opacity: 0;
+      animation: none;
+      filter: none;
+    }
+
+    .name-assembly.show .name-ghost {
+      opacity: .22;
+      filter: blur(0);
+    }
+    .name-assembly.show .name-code-fill::before {
+      opacity: .92;
+      filter: blur(0);
+      clip-path: inset(0 0 0 0);
+    }
+    .name-assembly.show .name-sheen::before {
+      animation: none;
+      opacity: 0;
+    }
+    .name-assembly.lock .name-code-fill::before {
+      opacity: 0;
+      filter: blur(3px);
+      transition:
+        opacity 650ms var(--soft-ease),
+        filter 650ms var(--soft-ease);
+    }
+    .name-assembly.lock .name-final-fill::before {
+      opacity: 1;
+      filter: blur(0);
+    }
+
+    .home-content {
+      filter: blur(8px);
+      transition:
+        opacity 850ms var(--soft-ease),
+        filter 850ms var(--soft-ease);
+    }
+    .home-sub {
+      transition:
+        opacity 1350ms var(--soft-ease) 520ms;
+    }
+
+    @keyframes codeTextureSmooth {
+      from { background-position: 0 0, 0 0; }
+      to   { background-position: 0 18px, 280px 0; }
+    }
+
+    @keyframes softSheen {
+      0%   { background-position: 130% 0; opacity: 0; }
+      22%  { opacity: .78; }
+      82%  { opacity: .68; }
+      100% { background-position: -30% 0; opacity: 0; }
+    }
+
+    /* ===================== FINAL HOME ===================== */
+    .home-content {
+      position: fixed;
+      inset: 0;
+      z-index: 23;
+      text-align: center;
+      color: var(--home-text);
+      opacity: 0;
+      transform: none;
+      filter: blur(6px);
+      transition:
+        opacity 850ms var(--soft-ease),
+        filter 850ms var(--soft-ease);
+      pointer-events: none;
+    }
+    .home-content.show {
+      opacity: 1;
+      transform: none;
+      filter: blur(0);
+      pointer-events: auto;
+    }
+    .home-name {
+      position: absolute;
+      transform-origin: center center;
+      scale: 1 !important;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: max-content;
+      max-width: calc(100vw - 24px);
+      font-family: var(--hand);
+      font-size: var(--name-size);
+      line-height: 1;
+      text-shadow: none;
+    }
+    .home-sub  {
+      position: absolute;
+      left: 50%;
+      top: calc(50% + clamp(54px, 9.2vw, 96px));
+      transform: translateX(-50%);
+      width: max-content;
+      max-width: calc(100vw - 24px);
+      font-family: var(--hand);
+      font-size: clamp(20px, 4.5vw, 30px);
+      opacity: 0;
+      margin-top: 0;
+      transition:
+        opacity 650ms var(--soft-ease) 180ms;
+    }
+    .home-content.show .home-sub {
+      opacity: .7;
+      transform: translateX(-50%);
+    }
+
+    .code-caret {
+      display: inline-block;
+      width: .62em;
+      height: 1.05em;
+      background: currentColor;
+      transform: translateY(2px);
+      animation: caretBlink .8s steps(1) infinite;
+    }
+    @keyframes caretBlink { 50% { opacity: 0; } }
+
+
+
+    /* ===================== HARD LOCK: MAHIKA RAJ NEVER MOVES ===================== */
+    .name-assembly,
+    .name-assembly.show,
+    .name-assembly.lock,
+    .name-assembly.resolve {
+      position: fixed !important;
+      inset: 0 !important;
+      display: block !important;
+      align-items: unset !important;
+      justify-content: unset !important;
+      transform: none !important;
+      scale: 1 !important;
+      translate: none !important;
+      rotate: none !important;
+      filter: none !important;
+      pointer-events: none !important;
+      transition: opacity 420ms var(--soft-ease) !important;
+    }
+
+    .name-assembly { opacity: 0 !important; }
+    .name-assembly.show { opacity: 1 !important; }
+    .name-assembly.resolve { opacity: 0 !important; }
+
+    .compile-wrap {
+      position: fixed !important;
+      left: 50% !important;
+      top: 50% !important;
+      width: max-content !important;
+      max-width: calc(100vw - 24px) !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      display: grid !important;
+      place-items: center !important;
+      transform: translate3d(-50%, -50%, 0) !important;
+      transform-origin: 50% 50% !important;
+      scale: 1 !important;
+      translate: none !important;
+      rotate: none !important;
+      filter: none !important;
+    }
+
+    .smooth-name,
+    .smooth-name-layer,
+    .smooth-name-layer::before,
+    .home-name {
+      font-family: var(--hand) !important;
+      font-size: var(--name-size) !important;
+      line-height: 1 !important;
+      letter-spacing: 0 !important;
+      white-space: nowrap !important;
+      max-width: calc(100vw - 24px) !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      transform-origin: 50% 50% !important;
+      scale: 1 !important;
+      translate: none !important;
+      rotate: none !important;
+      filter: none !important;
+      text-shadow: none !important;
+      -webkit-text-stroke: 0 !important;
+      animation-timing-function: linear !important;
+    }
+
+    .smooth-name,
+    .smooth-name-layer,
+    .smooth-name-layer::before {
+      transform: none !important;
+    }
+
+    .home-content,
+    .home-content.show {
+      transform: none !important;
+      scale: 1 !important;
+      translate: none !important;
+      rotate: none !important;
+      transition: opacity 420ms var(--soft-ease) !important;
+      filter: none !important;
+    }
+
+    .home-name {
+      position: fixed !important;
+      left: 50% !important;
+      top: 50% !important;
+      width: max-content !important;
+      transform: translate3d(-50%, -50%, 0) !important;
+    }
+
+    .name-ghost,
+    .name-sheen,
+    .name-sheen::before {
+      display: none !important;
+      opacity: 0 !important;
+      animation: none !important;
+      filter: none !important;
+      text-shadow: none !important;
+    }
+
+    .name-code-fill::before,
+    .name-final-fill::before {
+      filter: none !important;
+      text-shadow: none !important;
+      -webkit-text-stroke: 0 !important;
+      transform: none !important;
+      scale: 1 !important;
+      translate: none !important;
+      rotate: none !important;
+    }
+
+    @keyframes glyphRise {
+      0%   { opacity: 0; transform: none; filter: none; color: rgba(255,255,255,0); }
+      45%  { opacity: .86; transform: none; filter: none; }
+      100% { opacity: 1; transform: none; filter: none; color: rgba(255,255,255,.08); }
+    }
+
+    @media (max-width: 480px) {
+      .terminal-loader { min-height: 184px; padding: 19px 20px 21px; border-radius: 22px; }
+      .loading { right: 12px; }
+      .cmd-line { font-size: 12px; }
+      .terminal-title { font-size: 10px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #loader, #home, .home-content, .cmd-line, .code-lane, .name-assembly, .source-band, .glyph, .glyph::before, .glyph::after, .compile-sweep {
+        transition: none !important;
+        animation: none !important;
+      }
+    }
+  
+
+    /* ===================== SUBTITLE FIX: NO PERCEIVED NAME GROWTH ===================== */
+    /* The title and subtitle are now separate fixed layers. The subtitle can fade in,
+       but it cannot push, resize, thicken, or re-center Mahika Raj. */
+    .home-content,
+    .home-content.show {
+      position: fixed !important;
+      inset: 0 !important;
+      opacity: 1 !important;
+      transform: none !important;
+      scale: 1 !important;
+      translate: none !important;
+      rotate: none !important;
+      filter: none !important;
+      transition: none !important;
+    }
+
+    .home-name {
+      position: fixed !important;
+      left: 50% !important;
+      top: 50% !important;
+      transform: translate3d(-50%, -50%, 0) !important;
+      transform-origin: 50% 50% !important;
+      scale: 1 !important;
+      translate: none !important;
+      rotate: none !important;
+      opacity: 0 !important;
+      transition: none !important;
+      font-size: var(--name-size) !important;
+      line-height: 1 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      text-shadow: none !important;
+      filter: none !important;
+    }
+
+    .home-content.show .home-name {
+      opacity: 1 !important;
+    }
+
+    .home-sub,
+    .home-content.show .home-sub {
+      position: fixed !important;
+      left: 50% !important;
+      top: calc(50% + clamp(62px, 9.8vw, 104px)) !important;
+      transform: translate3d(-50%, 0, 0) !important;
+      transform-origin: 50% 0 !important;
+      scale: 1 !important;
+      translate: none !important;
+      rotate: none !important;
+      width: max-content !important;
+      max-width: calc(100vw - 24px) !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      line-height: 1 !important;
+      text-shadow: none !important;
+      filter: none !important;
+    }
+
+    .home-sub {
+      opacity: 0 !important;
+      transition: opacity 480ms var(--soft-ease) !important;
+    }
+
+    .home-content.show .home-sub {
+      opacity: .7 !important;
+    }
+
+    /* Avoid the exact moment where two Mahika Raj layers overlap and look thicker/bigger. */
+    .name-assembly.resolve {
+      opacity: 0 !important;
+      transition: none !important;
+    }
+
+
+    /* ===================== REMOVE RAIN -> NAME TRANSITION ===================== */
+    /* No temporary name assembly is shown. The code rain fades out, then the final
+       fixed Mahika Raj title appears without emerging, compiling, glowing, or scaling. */
+    .name-assembly,
+    .compile-wrap,
+    .source-band,
+    .smooth-name {
+      display: none !important;
+      opacity: 0 !important;
+      animation: none !important;
+      transition: none !important;
+    }
+
+
+
+    /* ===================== EXACT CODE_JUMP FINAL HOME POSITIONING ===================== */
+    /* Copied to match index_9_code_transition_code_jump(2).html positioning exactly:
+       centered flex column, normal document flow between title and subtitle. */
+    .home-content {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 21 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-align: center !important;
+      color: var(--home-text) !important;
+      opacity: 0 !important;
+      transform: none !important;
+      transition: opacity 520ms var(--soft-ease) !important;
+      pointer-events: none !important;
+      filter: none !important;
+      scale: 1 !important;
+      translate: none !important;
+      rotate: none !important;
+    }
+
+    .home-content.show {
+      opacity: 1 !important;
+      transform: none !important;
+      pointer-events: auto !important;
+      filter: none !important;
+      scale: 1 !important;
+      translate: none !important;
+      rotate: none !important;
+    }
+
+    .home-name {
+      position: static !important;
+      left: auto !important;
+      top: auto !important;
+      width: auto !important;
+      max-width: none !important;
+      transform: none !important;
+      transform-origin: initial !important;
+      scale: 1 !important;
+      translate: none !important;
+      rotate: none !important;
+      opacity: 1 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      font-family: var(--hand) !important;
+      font-size: clamp(48px, 12vw, 110px) !important;
+      line-height: 1 !important;
+      text-shadow: none !important;
+      filter: none !important;
+      -webkit-text-stroke: 0 !important;
+    }
+
+    .home-content.show .home-name {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+
+    .home-sub {
+      position: static !important;
+      left: auto !important;
+      top: auto !important;
+      width: auto !important;
+      max-width: none !important;
+      transform: none !important;
+      transform-origin: initial !important;
+      scale: 1 !important;
+      translate: none !important;
+      rotate: none !important;
+      font-family: var(--hand) !important;
+      font-size: clamp(20px, 4.5vw, 30px) !important;
+      opacity: 0.7 !important;
+      margin-top: 10px !important;
+      padding: 0 !important;
+      text-shadow: none !important;
+      filter: none !important;
+      transition: none !important;
+    }
+
+    .home-content.show .home-sub {
+      position: static !important;
+      opacity: 0.7 !important;
+      transform: none !important;
+    }
+
+
+    /* ===================== CODE GATHERS INTO NAME ===================== */
+    /* Re-enable the temporary code-built Mahika Raj layer, but keep it locked
+       to the final title size so the final name does not grow or jump. */
+    .name-assembly {
+      display: block !important;
+      opacity: 0 !important;
+      z-index: 24 !important;
+      transition: opacity 620ms var(--soft-ease) !important;
+    }
+
+    .name-assembly.show {
+      display: block !important;
+      opacity: 1 !important;
+      transition: opacity 620ms var(--soft-ease) !important;
+    }
+
+    .name-assembly.resolve {
+      display: block !important;
+      opacity: 0 !important;
+      transition: opacity 420ms var(--soft-ease) !important;
+    }
+
+    .compile-wrap {
+      display: grid !important;
+      place-items: center !important;
+    }
+
+    .source-band {
+      display: block !important;
+      opacity: 0 !important;
+      transition:
+        opacity 900ms var(--soft-ease),
+        transform 1100ms var(--soft-ease),
+        height 1100ms var(--soft-ease) !important;
+    }
+
+    .smooth-name {
+      display: grid !important;
+      place-items: center !important;
+      font-size: var(--name-size) !important;
+      transform: none !important;
+      scale: 1 !important;
+    }
+
+    .name-code-fill,
+    .name-final-fill {
+      display: block !important;
+      opacity: 1 !important;
+    }
+
+    .name-assembly.show .source-band {
+      opacity: .88 !important;
+      transform: translate(-50%, -50%) scaleX(1) !important;
+      height: clamp(70px, 8.8vw, 94px) !important;
+    }
+
+    .name-assembly.lock .source-band {
+      opacity: 0 !important;
+      transform: translate(-50%, -50%) scaleX(.18) !important;
+      height: 2px !important;
+      transition:
+        opacity 760ms var(--soft-ease),
+        transform 760ms var(--soft-ease),
+        height 760ms var(--soft-ease) !important;
+    }
+
+    .name-assembly.show .name-code-fill::before {
+      opacity: .96 !important;
+      filter: none !important;
+      clip-path: inset(0 0 0 0) !important;
+      transition:
+        clip-path 1150ms var(--soft-ease),
+        opacity 850ms var(--soft-ease),
+        filter 760ms var(--soft-ease) !important;
+    }
+
+    .name-assembly.lock .name-code-fill::before {
+      opacity: 0 !important;
+      filter: none !important;
+      transition: opacity 560ms var(--soft-ease) !important;
+    }
+
+    .name-assembly.lock .name-final-fill::before {
+      opacity: 1 !important;
+      filter: none !important;
+      transition: opacity 560ms var(--soft-ease) !important;
+    }
+
+    .code-lane.gather {
+      opacity: .16 !important;
+      filter: blur(1.5px) !important;
+      transition:
+        opacity 900ms var(--soft-ease),
+        filter 900ms var(--soft-ease) !important;
+    }
+
+
+    /* ===================== EXTRA SMOOTH HANDOFF OVERRIDES ===================== */
+    #loader {
+      transition:
+        opacity 1050ms cubic-bezier(.16,1,.3,1),
+        filter 1050ms cubic-bezier(.16,1,.3,1) !important;
+    }
+    #loader.hide {
+      filter: blur(1.6px) !important;
+    }
+    .code-lane {
+      transition:
+        opacity 1100ms cubic-bezier(.16,1,.3,1),
+        color 3200ms cubic-bezier(.16,1,.3,1),
+        filter 1100ms cubic-bezier(.16,1,.3,1) !important;
+    }
+    #codeScreen.dark .code-lane {
+      color: rgba(255,255,255,.28) !important;
+    }
+    .code-lane.focus {
+      opacity: .38 !important;
+      filter: blur(.35px) !important;
+      transition:
+        opacity 1300ms cubic-bezier(.16,1,.3,1),
+        filter 1300ms cubic-bezier(.16,1,.3,1),
+        color 3200ms cubic-bezier(.16,1,.3,1) !important;
+    }
+    .code-lane.gather {
+      opacity: .20 !important;
+      filter: blur(1px) !important;
+      transition:
+        opacity 1300ms cubic-bezier(.16,1,.3,1),
+        filter 1300ms cubic-bezier(.16,1,.3,1),
+        color 3200ms cubic-bezier(.16,1,.3,1) !important;
+    }
+    .code-lane.fade {
+      opacity: 0 !important;
+      filter: blur(3.4px) !important;
+      transition:
+        opacity 1650ms cubic-bezier(.16,1,.3,1),
+        filter 1650ms cubic-bezier(.16,1,.3,1) !important;
+    }
+    .name-assembly,
+    .name-assembly.show,
+    .name-assembly.resolve {
+      transition: opacity 850ms cubic-bezier(.16,1,.3,1) !important;
+    }
+    .name-assembly.lock .source-band {
+      transition:
+        opacity 1150ms cubic-bezier(.16,1,.3,1),
+        transform 1150ms cubic-bezier(.16,1,.3,1),
+        height 1150ms cubic-bezier(.16,1,.3,1) !important;
+    }
+    .name-assembly.lock .name-code-fill::before,
+    .name-assembly.lock .name-final-fill::before {
+      transition:
+        opacity 900ms cubic-bezier(.16,1,.3,1),
+        filter 900ms cubic-bezier(.16,1,.3,1) !important;
+    }
+    .home-content {
+      transition: opacity 850ms cubic-bezier(.16,1,.3,1) !important;
+    }
+
+    /* ===================== BRIGHT WHITE CODE AT START ===================== */
+    /* The background timing stays the same. This only keeps the code text itself
+       brighter/whiter at the beginning, then lets it settle back to softer rain. */
+    #codeScreen.dark .code-lane.bright-code {
+      color: rgba(255,255,255,.82) !important;
+      opacity: .72 !important;
+      filter: blur(0) !important;
+      transition:
+        opacity 1250ms cubic-bezier(.16,1,.3,1),
+        color 1250ms cubic-bezier(.16,1,.3,1),
+        filter 1250ms cubic-bezier(.16,1,.3,1) !important;
+    }
+
+    #codeScreen.dark .code-lane.bright-code.focus {
+      color: rgba(255,255,255,.72) !important;
+      opacity: .56 !important;
+      filter: blur(.15px) !important;
+    }
+
+    #codeScreen.dark .code-lane.bright-code.gather {
+      color: rgba(255,255,255,.68) !important;
+      opacity: .44 !important;
+      filter: blur(.45px) !important;
+    }
+
+    /* ===================== DELAY SUBTITLE AFTER MAHIKA RAJ ===================== */
+    .home-content .home-sub {
+      opacity: 0 !important;
+      transition: opacity 700ms cubic-bezier(.16,1,.3,1) 1700ms !important;
+    }
+
+    .home-content.show .home-sub {
+      opacity: .7 !important;
+    }
+
+    /* ===================== SUBTITLE SLIGHTLY LOWER ===================== */
+    .home-sub,
+    .home-content.show .home-sub {
+      margin-top: 18px !important;
+    }
+
+    /* ===================== CENTER TITLE + SUBTITLE AS ONE GROUP ===================== */
+    /* The name and subtitle are centered together as a single visual block.
+       Mahika Raj is no longer the only thing visually centered by itself. */
+    .home-content,
+    .home-content.show {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 18px !important;
+    }
+
+    .home-name,
+    .home-content.show .home-name {
+      position: static !important;
+      transform: none !important;
+      margin: 0 !important;
+    }
+
+    .home-sub,
+    .home-content.show .home-sub {
+      position: static !important;
+      transform: none !important;
+      margin: 0 !important;
+    }
+
+    /* ===================== REAL SWEEZY .ANI CURSOR ===================== */
+    /* Uses the uploaded .ani file by extracting its 32x32 animated frames.
+       Native CSS cursor cannot reliably play .ani in modern browsers, so this
+       hides the system cursor and draws the real ANI frames as a custom cursor. */
+    * {
+      cursor: none !important;
+    }
+
+    #sweezyAniCursor {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 32px;
+      height: 32px;
+      pointer-events: none;
+      z-index: 2147483647;
+      background-repeat: no-repeat;
+      background-position: 0 0;
+      background-size: 32px 32px;
+      transform: translate3d(-100px, -100px, 0);
+      will-change: transform, background-image;
+    }
+
+    @media (pointer: coarse) {
+      * { cursor: auto !important; }
+      #sweezyAniCursor { display: none !important; }
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <!-- hand-drawn wobble for the loader bar -->
+    <filter id="rough">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.018" numOctaves="2" seed="7" result="n" />
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </svg>
+
+  <div class="reveal-wrap">
+    <div id="home"></div>
+    <div id="codeScreen" aria-hidden="true"></div>
+  </div>
+
+  <div class="home-content">
+    <h1 class="home-name">Mahika Raj</h1>
+    <p class="home-sub">AI/ML Researcher | Georgia Tech CS Student</p>
+  </div>
+
+  <!-- UNIFIED LOADER + NPM RUN BUILD -->
+  <div id="loader">
+    <div class="stage">
+      <div class="loading">loading...</div>
+
+      <div class="terminal-loader">
+        <div class="terminal-top">
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="terminal-title">mahika@portfolio</span>
+        </div>
+
+        <div class="cmd-stack">
+          <div class="cmd-line" id="cmd1"><span class="muted">$</span> npm run build</div>
+          <div class="cmd-line" id="cmd2"><span class="muted">→</span> compiling portfolio</div>
+          <div class="cmd-line" id="cmd3"><span class="ok">✓ ready</span> <span class="code-caret"></span></div>
+        </div>
+
+        <div class="bar">
+          <div class="outline"></div>
+          <div class="inner"><div class="segs" id="segs"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var N = 10;
+      var DURATION = 3000; // balanced loader timing: npm + compiling + ready
+      var segsEl = document.getElementById('segs');
+      var loader = document.getElementById('loader');
+      var home = document.getElementById('home');
+      var codeScreen = document.getElementById('codeScreen');
+      var content = document.querySelector('.home-content');
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      var snippets = [
+        'const site = build();',
+        'render(<Home />);',
+        'git push origin main',
+        'npm run dev',
+        'while (learning) { build(); }',
+        'import projects from "./projects";',
+        'return clean_code;',
+        'status = "ready";',
+        'fetch("/api/work")',
+        'class Portfolio extends Project {}',
+        'function solve() { return true; }',
+        'deploy --prod'
+      ];
+
+      var bandCode = [
+        'npm run build  •  const site = build();  •  render(<Home />);  •  status = "ready";  •  deploy --prod  •  ',
+        'while (learning) { build(); }  •  import projects from "./projects";  •  return clean_code;  •  ',
+        'git push origin main  •  function solve() { return true; }  •  fetch("/api/work")  •  '
+      ];
+
+      var segs = [];
+      for (var i = 0; i < N; i++) {
+        var s = document.createElement('div');
+        s.className = 'seg';
+        s.style.setProperty('--r', (Math.random() * 7 - 3.5).toFixed(1) + 'deg');
+        segsEl.appendChild(s);
+        segs.push(s);
+      }
+
+      function spawnSlidingCode() {
+        var rows = 17;
+        for (var row = 0; row < rows; row++) {
+          var lane = document.createElement('div');
+          lane.className = 'code-lane bright-code';
+
+          var movingRight = row % 2 === 0;
+          lane.style.setProperty('--y', (4 + row * 6.45 + (Math.random() * 1.1 - .55)).toFixed(2) + 'vh');
+          lane.style.setProperty('--start-x', movingRight ? '-18vw' : '18vw');
+          lane.style.setProperty('--end-x', movingRight ? '18vw' : '-18vw');
+          lane.style.setProperty('--dur', (13200 + Math.random() * 5600).toFixed(0) + 'ms');
+          lane.style.setProperty('--delay', (-Math.random() * 7600).toFixed(0) + 'ms');
+          lane.style.setProperty('--alpha', (0.24 + Math.random() * 0.24).toFixed(2));
+
+          for (var j = 0; j < 14; j++) {
+            var pill = document.createElement('span');
+            pill.className = 'code-pill';
+            pill.textContent = snippets[(row + j) % snippets.length];
+            lane.appendChild(pill);
+          }
+
+          codeScreen.appendChild(lane);
+          requestAnimationFrame((function (node) {
+            return function () { node.classList.add('show'); };
+          })(lane));
+        }
+      }
+
+      function createNameAssembly() {
+        var assembly = document.createElement('div');
+        assembly.className = 'name-assembly';
+        assembly.id = 'nameAssembly';
+
+        var wrap = document.createElement('div');
+        wrap.className = 'compile-wrap';
+
+        var band = document.createElement('div');
+        band.className = 'source-band';
+        for (var b = 0; b < bandCode.length; b++) {
+          var row = document.createElement('span');
+          row.textContent = bandCode[b] + bandCode[b] + bandCode[b];
+          band.appendChild(row);
+        }
+
+        var name = document.createElement('div');
+        name.className = 'smooth-name';
+
+        var ghost = document.createElement('span');
+        ghost.className = 'smooth-name-layer name-ghost';
+        ghost.textContent = 'Mahika Raj';
+
+        var code = document.createElement('span');
+        code.className = 'smooth-name-layer name-code-fill';
+        code.setAttribute('data-text', 'Mahika Raj');
+
+        var finalName = document.createElement('span');
+        finalName.className = 'smooth-name-layer name-final-fill';
+        finalName.setAttribute('data-text', 'Mahika Raj');
+
+        var sheen = document.createElement('span');
+        sheen.className = 'smooth-name-layer name-sheen';
+        sheen.setAttribute('data-text', 'Mahika Raj');
+
+        name.appendChild(ghost);
+        name.appendChild(code);
+        name.appendChild(finalName);
+        name.appendChild(sheen);
+
+        wrap.appendChild(band);
+        wrap.appendChild(name);
+        assembly.appendChild(wrap);
+        codeScreen.appendChild(assembly);
+        return assembly;
+      }
+
+      function reveal() {
+        // Balanced 3.0s npm loader; Mahika Raj appears smoothly while the
+        // code is still on screen. The code then departs later and more slowly.
+        codeScreen.innerHTML = '';
+        codeScreen.classList.remove('dark');
+        codeScreen.style.display = 'flex';
+
+        // Smooth handoff: code starts beneath the loader first, then the black
+        // screen eases in, so the white-to-black change stays soft.
+        requestAnimationFrame(function () {
+          spawnSlidingCode();
+        });
+
+        setTimeout(function () {
+          loader.classList.add('hide');
+        }, 150);
+
+        setTimeout(function () {
+          codeScreen.classList.add('dark');
+        }, 620);
+
+        setTimeout(function () {
+          loader.style.display = 'none';
+        }, 1100);
+
+        setTimeout(function () {
+          home.classList.add('settled');
+        }, 2050);
+
+        setTimeout(function () {
+          var lanes = codeScreen.querySelectorAll('.code-lane');
+          for (var i = 0; i < lanes.length; i++) lanes[i].classList.add('focus');
+        }, 1850);
+
+        setTimeout(function () {
+          var lanes = codeScreen.querySelectorAll('.code-lane');
+          for (var i = 0; i < lanes.length; i++) lanes[i].classList.add('gather');
+        }, 1350);
+
+        setTimeout(function () {
+          var lanes = codeScreen.querySelectorAll('.code-lane');
+          for (var i = 0; i < lanes.length; i++) lanes[i].classList.remove('bright-code');
+        }, 3450);
+
+        var assembly = null;
+        setTimeout(function () {
+          assembly = createNameAssembly();
+          requestAnimationFrame(function () {
+            assembly.classList.add('show');
+          });
+        }, 2350);
+
+        // Bring in the final clean title about 2s earlier, while the code is still running.
+        setTimeout(function () {
+          content.classList.add('show');
+        }, 2550);
+
+        // Let the code depart later, and leave more time for the fade.
+        setTimeout(function () {
+          var lanes = codeScreen.querySelectorAll('.code-lane');
+          for (var i = 0; i < lanes.length; i++) lanes[i].classList.add('fade');
+          if (assembly) assembly.classList.add('lock');
+        }, 4250);
+
+        setTimeout(function () {
+          if (assembly) assembly.classList.add('resolve');
+        }, 5000);
+
+        setTimeout(function () {
+          codeScreen.style.display = 'none';
+          codeScreen.classList.remove('dark');
+          codeScreen.innerHTML = '';
+        }, 5200);
+      }
+
+      if (reduce) {
+        segs.forEach(function (s) { s.classList.add('on'); });
+        loader.style.display = 'none';
+        home.classList.add('settled');
+        content.classList.add('show');
+        return;
+      }
+
+      var cmd1 = document.getElementById('cmd1');
+      var cmd2 = document.getElementById('cmd2');
+      var cmd3 = document.getElementById('cmd3');
+
+      // NPM text popup timing is synced to the 3.5s loading bar.
+      // Ready appears earlier now, so it holds longer before the handoff.
+      setTimeout(function () { cmd1.classList.add('show'); }, 320);
+      setTimeout(function () { cmd2.classList.add('show'); }, 1000);
+      setTimeout(function () { cmd3.classList.add('show'); }, 1650);
+
+      var start = null;
+      var lastShow = -1;
+      function frame(now) {
+        if (start === null) start = now;
+        var p = Math.min((now - start) / DURATION, 1);
+        var show = p >= 1 ? N : Math.floor(p * N);
+        if (show !== lastShow) {
+          for (var i = 0; i < N; i++) segs[i].classList.toggle('on', i < show);
+          lastShow = show;
+        }
+        if (p < 1) requestAnimationFrame(frame);
+        else reveal();
+      }
+      requestAnimationFrame(frame);
+    })();
+  </script>
+  <script>
+    (function () {
+      var frames = ['data:image/png;base64,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','data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAFhUlEQVRYCb1XeWwUZRT/zc5ePbeFlqOcDZe1pR5Ag2A5TDEBYiqGIt0FiwJtSdRETEBDYtKEP1ATiiaoLTVAoa0cQQII2IgUMVHCYbh6aKlIz+2W3Xbb7R4zs59vZruRlN3ugtAv2czMe9/3fr+863vLlecWbgPHtnOMbVlbVfo5hnmpALYt/bVXIYrSZweMBQeHGR8qcODUPIe870rhcbpM+43514eTBHkAPMcRD5UKubuKIPQ50w8YC1uHi4RMABzHKXhuRz9yv94Bp92eVJ5b4BoOEjIBCoKPgAzIJAkbT1bAK0m6cmMBe9okVISg8nvA/5RBV2zfgujEBMgkvlz6nu5pEVFxYBwo/oMXYwwrdm3H2JRpiIv3uA6syR87eM+T+CZkSkH+YQJ+4xmrs/HskgVgTNW215Q/0y9/Us/gyH4Eyo9p8+dg8QebwDPuRrkp3+hXPYmnQmAoD/hBxs9Kx7KP36UkZRXlpoIiv/z/PkN74AEEtVaL1Xt2QnILn1ByHn9A9divPgLUiMJdmogImOjKkEQxm8JRG+65YPsU5AfaQLB9itxh6wFHCXvt2GksyJpPJFhKubGwc8hDIZQDBMLzwB9lVTi5cTO6b9UhkklYmJFG5lkihUMIgRNU7UMOwwX1Z84hbdxotHRZkTE7DaLbDY2GhygI0Bti1Y/bNQc88F8rDkb19qkf0UIhMK55HQ6bDWJPP9wdPVi6eA76iFTUiDilax7OyeGD2QgkD8/3dLKvy4a61g70dbTD3W6DOjYCujEGeY5A1tx0OG3dtIvBpYmvCgQUTKZWFAMOaLlZj6snqjF94TykLpqrqFTUrK+froFAl1QmyYRuOwHHyQ0UXpcAgTyhUfPQqtVweoR1eVWl+4OBBZL7CNCFKK9Lh09iaXoKWFsHbu3eh1uNf0NniEX28kWYuOBFnKn5HctffgEeq4O6IuCRRFxrboNbEDEzaQxums1XA4EMJVMI/HXxEqq/2IOo2Ghc6ejEyMR4qOJiMHFaMryCB73W+4DEkD4hCWd/uwGevBJH/WBywgi8lDyJiEjQUHmyViaPdM8PBThYpxBovl2PVauWoZ+Sy+v1KtOR1y0iKVKHusZmWO52wmzvhY0yPnPqZHTR4NLQYYH1XguidDpIdMZFOg3HHx0MEOpbITB93hxAr6cUotBSPN1tNuiS4imnGJ4ZOwq/Nt6F1hCDZZvzcWrHbiyZm4qJU8fRLAfUXK6FB8Li9YfKakKBBdIrVTBp9nOoKjsEfXQUBEuvL8mIjWC246e6RkRoNOD7XdCR3lhWjKPHz9M0C3jplzkrBRMSE88fNBWuCAQQSuYrQxpIIsh4S3M7NCOjlTMeix1XKcFemTEF4+MMmJ+RiuqdpYou79tiXKttQsOdVly4dDOn3Wwr9oJtDQUWSK+E4MJX+8DrtJ82t1m2JsTHQrjfh9o2M6aOSkCD2YLUyeMgiCJclCMcz1PNMPBEykY65sWba6u+yQlkPByZ6q3KEk4vREbmVZZ8ZLH1glGJXfyzCVMSRsIQoUd7jx0aQyR4yvJF1Psr335fsZu5wYhO8hgNdCvDAQq2RwnBqiPFTnmDTsNn/dxwp3766ERoNWrcs9qg4vmFjn4nztZcwbEfLkJNDUh0eyB6BGyqPgJ3nwN7TZt8XSsYyhByJQR+/ZqKknP0TldsQRnV9vpma/e5dZUlv5yI2Qw1JeLKHdsQk5wMl6UTLrfvb4M8SasgUsk83vIl4aCzFJYNTV3WlLWVJVmyqrvXIXIM3x/+sIgqk8FL/V8uURv1AW10JPIq9pwZZCLsz4FbILz95Bmnx+HUJ6XNgKXpH1/D4rjsdQe/PhGehYd3PRIB+XiFseANicM75InLeZWlRQ+bfDTJvzU6CsKhrXe5AAAAAElFTkSuQmCC','data:image/png;base64,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','data:image/png;base64,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'];
+      var hotX = 1;
+      var hotY = 0;
+      var interval = 183;
+      if (!frames.length || !window.matchMedia('(pointer: fine)').matches) return;
+
+      var cursor = document.createElement('div');
+      cursor.id = 'sweezyAniCursor';
+      cursor.style.backgroundImage = 'url("' + frames[0] + '")';
+      document.body.appendChild(cursor);
+
+      var x = -100, y = -100, seen = false;
+      window.addEventListener('mousemove', function (e) {
+        x = e.clientX;
+        y = e.clientY;
+        seen = true;
+        cursor.style.transform = 'translate3d(' + (x - hotX) + 'px,' + (y - hotY) + 'px,0)';
+      }, { passive: true });
+
+      window.addEventListener('mouseleave', function () {
+        cursor.style.opacity = '0';
+      });
+      window.addEventListener('mouseenter', function () {
+        cursor.style.opacity = seen ? '1' : '0';
+      });
+
+      var i = 0;
+      setInterval(function () {
+        i = (i + 1) % frames.length;
+        cursor.style.backgroundImage = 'url("' + frames[i] + '")';
+      }, interval);
+    })();
+  </script>
+
+</body>
+</html>
