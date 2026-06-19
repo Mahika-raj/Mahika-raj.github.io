@@ -47,6 +47,8 @@
       transition: opacity 720ms cubic-bezier(.16,1,.3,1);
     }
     #home.settled { opacity: 1; }
+    #stars { position:absolute; inset:0; z-index:1; pointer-events:none; opacity:0; transition: opacity 1300ms ease; }
+    #stars.lit { opacity:1; }
 
     #codeScreen {
       position: absolute;
@@ -60,12 +62,14 @@
       font-family: var(--mono);
       transition:
         background-color 2300ms cubic-bezier(.16, 1, .3, 1),
-        color 2300ms cubic-bezier(.16, 1, .3, 1);
+        color 2300ms cubic-bezier(.16, 1, .3, 1),
+        opacity 1200ms ease;
     }
     #codeScreen.dark {
       background: var(--home-bg);
       color: var(--home-text);
     }
+    #codeScreen.gone { opacity: 0; }
 
     /* ===================== UNIFIED LOADING + TERMINAL ===================== */
     #loader {
@@ -209,7 +213,7 @@
     #codeScreen {
       isolation: isolate;
       background: var(--bg) !important;
-      transition: color 3200ms cubic-bezier(.16, 1, .3, 1) !important;
+      transition: color 1600ms cubic-bezier(.16, 1, .3, 1) !important;
     }
     #codeScreen::before {
       content: "";
@@ -218,7 +222,7 @@
       z-index: 0;
       background: var(--home-bg);
       opacity: 0;
-      transition: opacity 3200ms cubic-bezier(.16, 1, .3, 1);
+      transition: opacity 1600ms cubic-bezier(.16, 1, .3, 1);
       pointer-events: none;
     }
     #codeScreen.dark {
@@ -251,7 +255,7 @@
       filter: blur(2px);
       transition:
         opacity 760ms cubic-bezier(.16, 1, .3, 1),
-        color 2300ms cubic-bezier(.16, 1, .3, 1),
+        color 4200ms cubic-bezier(.16, 1, .3, 1),
         filter 760ms cubic-bezier(.16, 1, .3, 1);
       animation: laneSlide var(--dur) linear var(--delay) infinite;
       will-change: transform, opacity, color;
@@ -269,8 +273,8 @@
       opacity: 0;
       filter: blur(4px);
       transition:
-        opacity 900ms cubic-bezier(.16, 1, .3, 1),
-        filter 900ms cubic-bezier(.16, 1, .3, 1);
+        opacity 2400ms cubic-bezier(.16, 1, .3, 1),
+        filter 2400ms cubic-bezier(.16, 1, .3, 1);
     }
     .code-pill { display: inline-block; opacity: .9; }
 
@@ -527,7 +531,7 @@
     .code-lane {
       transition:
         opacity 760ms var(--soft-ease),
-        color 2300ms var(--soft-ease),
+        color 4200ms var(--soft-ease),
         filter 760ms var(--soft-ease);
     }
     .code-lane.focus {
@@ -541,8 +545,8 @@
       opacity: 0;
       filter: blur(3px);
       transition:
-        opacity 900ms var(--soft-ease),
-        filter 900ms var(--soft-ease);
+        opacity 2400ms var(--soft-ease),
+        filter 2400ms var(--soft-ease);
     }
 
     .name-assembly {
@@ -1185,7 +1189,7 @@
     .code-lane {
       transition:
         opacity 1100ms cubic-bezier(.16,1,.3,1),
-        color 3200ms cubic-bezier(.16,1,.3,1),
+        color 1600ms cubic-bezier(.16,1,.3,1),
         filter 1100ms cubic-bezier(.16,1,.3,1) !important;
     }
     #codeScreen.dark .code-lane {
@@ -1197,7 +1201,7 @@
       transition:
         opacity 1300ms cubic-bezier(.16,1,.3,1),
         filter 1300ms cubic-bezier(.16,1,.3,1),
-        color 3200ms cubic-bezier(.16,1,.3,1) !important;
+        color 1600ms cubic-bezier(.16,1,.3,1) !important;
     }
     .code-lane.gather {
       opacity: .20 !important;
@@ -1205,7 +1209,7 @@
       transition:
         opacity 1300ms cubic-bezier(.16,1,.3,1),
         filter 1300ms cubic-bezier(.16,1,.3,1),
-        color 3200ms cubic-bezier(.16,1,.3,1) !important;
+        color 1600ms cubic-bezier(.16,1,.3,1) !important;
     }
     .code-lane.fade {
       opacity: 0 !important;
@@ -1263,7 +1267,7 @@
     /* ===================== DELAY SUBTITLE AFTER MAHIKA RAJ ===================== */
     .home-content .home-sub {
       opacity: 0 !important;
-      transition: opacity 700ms cubic-bezier(.16,1,.3,1) 1700ms !important;
+      transition: opacity 650ms cubic-bezier(.16,1,.3,1) 700ms !important;
     }
 
     .home-content.show .home-sub {
@@ -1330,6 +1334,59 @@
       #sweezyAniCursor { display: none !important; }
     }
 
+
+    /* ---- top navigation: slides in when the home screen lands ---- */
+    .site-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 40;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: clamp(16px, 4vw, 46px);
+      padding: clamp(16px, 3vw, 26px) 24px;
+      opacity: 0;
+      transform: translateY(-130%);
+      transition: opacity .55s ease, transform .75s cubic-bezier(.16, 1, .3, 1);
+      pointer-events: none;
+    }
+    .site-nav.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .site-nav a {
+      font-family: var(--mono);
+      font-size: clamp(12.5px, 1.4vw, 15px);
+      letter-spacing: .04em;
+      color: rgba(255, 255, 255, .8);
+      text-decoration: none;
+      position: relative;
+      padding: 4px 2px;
+      opacity: 0;
+      transform: translateY(-7px);
+      transition: opacity .5s ease, transform .55s cubic-bezier(.16, 1, .3, 1), color .25s ease;
+    }
+    .site-nav.show a { opacity: 1; transform: none; }
+    .site-nav.show a:nth-child(1) { transition-delay: .10s; }
+    .site-nav.show a:nth-child(2) { transition-delay: .18s; }
+    .site-nav.show a:nth-child(3) { transition-delay: .26s; }
+    .site-nav.show a:nth-child(4) { transition-delay: .34s; }
+    .site-nav a:hover { color: #fff; }
+    .site-nav a::after {
+      content: "";
+      position: absolute;
+      left: 2px; right: 2px; bottom: 0;
+      height: 1.5px;
+      background: currentColor;
+      transform: scaleX(0);
+      transform-origin: left center;
+      transition: transform .3s ease;
+    }
+    .site-nav a:hover::after { transform: scaleX(1); }
+    @media (prefers-reduced-motion: reduce) {
+      .site-nav, .site-nav a { transition: none; transform: none; }
+    }
   </style>
 </head>
 
@@ -1345,6 +1402,7 @@
 
   <div class="reveal-wrap">
     <div id="home"></div>
+    <canvas id="stars" aria-hidden="true"></canvas>
     <div id="codeScreen" aria-hidden="true"></div>
   </div>
 
@@ -1352,6 +1410,13 @@
     <h1 class="home-name">Mahika Raj</h1>
     <p class="home-sub">AI/ML Researcher | Georgia Tech CS Student</p>
   </div>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="#about">About</a>
+    <a href="#projects">Projects</a>
+    <a href="#blog">Blog</a>
+    <a href="#contact">Contact me</a>
+  </nav>
 
   <!-- UNIFIED LOADER + NPM RUN BUILD -->
   <div id="loader">
@@ -1383,12 +1448,13 @@
   <script>
     (function () {
       var N = 10;
-      var DURATION = 3000; // balanced loader timing: npm + compiling + ready
+      var DURATION = 1600; // balanced loader timing: npm + compiling + ready
       var segsEl = document.getElementById('segs');
       var loader = document.getElementById('loader');
       var home = document.getElementById('home');
       var codeScreen = document.getElementById('codeScreen');
       var content = document.querySelector('.home-content');
+      var siteNav = document.querySelector('.site-nav');
       var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       var snippets = [
@@ -1511,34 +1577,34 @@
 
         setTimeout(function () {
           loader.classList.add('hide');
-        }, 150);
+        }, 120);
 
         setTimeout(function () {
           codeScreen.classList.add('dark');
-        }, 620);
+        }, 322);
 
         setTimeout(function () {
           loader.style.display = 'none';
-        }, 1100);
+        }, 572);
 
         setTimeout(function () {
           home.classList.add('settled');
-        }, 2050);
+        }, 1066);
 
         setTimeout(function () {
           var lanes = codeScreen.querySelectorAll('.code-lane');
           for (var i = 0; i < lanes.length; i++) lanes[i].classList.add('focus');
-        }, 1850);
+        }, 962);
 
         setTimeout(function () {
           var lanes = codeScreen.querySelectorAll('.code-lane');
           for (var i = 0; i < lanes.length; i++) lanes[i].classList.add('gather');
-        }, 1350);
+        }, 702);
 
         setTimeout(function () {
           var lanes = codeScreen.querySelectorAll('.code-lane');
           for (var i = 0; i < lanes.length; i++) lanes[i].classList.remove('bright-code');
-        }, 3450);
+        }, 1400);
 
         var assembly = null;
         setTimeout(function () {
@@ -1546,29 +1612,48 @@
           requestAnimationFrame(function () {
             assembly.classList.add('show');
           });
-        }, 2350);
+        }, 1050);
 
         // Bring in the final clean title about 2s earlier, while the code is still running.
         setTimeout(function () {
           content.classList.add('show');
-        }, 2550);
+        }, 1200);
 
-        // Let the code depart later, and leave more time for the fade.
+        setTimeout(function () {
+          if (siteNav) siteNav.classList.add('show');
+        }, 1350);
+
+        // Name + nav are up; lock the title but KEEP the code raining behind.
+        setTimeout(function () {
+          if (assembly) assembly.classList.add('lock');
+        }, 1700);
+
+        // Let the code linger behind the name, then dissolve away gradually —
+        // lane by lane — into clean dark.
         setTimeout(function () {
           var lanes = codeScreen.querySelectorAll('.code-lane');
-          for (var i = 0; i < lanes.length; i++) lanes[i].classList.add('fade');
-          if (assembly) assembly.classList.add('lock');
-        }, 4250);
+          for (var i = 0; i < lanes.length; i++) {
+            (function (ln, idx) {
+              setTimeout(function () { ln.classList.add('fade'); }, idx * 45);
+            })(lanes[i], i);
+          }
+        }, 4900);
 
         setTimeout(function () {
           if (assembly) assembly.classList.add('resolve');
-        }, 5000);
+        }, 2000);
+
+        setTimeout(function () {
+          var st = document.getElementById('stars'); if (st) st.classList.add('lit');
+          codeScreen.classList.add('gone');
+        }, 7100);
 
         setTimeout(function () {
           codeScreen.style.display = 'none';
           codeScreen.classList.remove('dark');
+          codeScreen.classList.remove('gone');
           codeScreen.innerHTML = '';
-        }, 5200);
+        }, 8500);
       }
 
       if (reduce) {
@@ -1576,6 +1661,7 @@
         loader.style.display = 'none';
         home.classList.add('settled');
         content.classList.add('show');
+          if (siteNav) siteNav.classList.add('show');
         return;
       }
 
@@ -1585,9 +1671,9 @@
 
       // NPM text popup timing is synced to the 3.5s loading bar.
       // Ready appears earlier now, so it holds longer before the handoff.
-      setTimeout(function () { cmd1.classList.add('show'); }, 320);
-      setTimeout(function () { cmd2.classList.add('show'); }, 1000);
-      setTimeout(function () { cmd3.classList.add('show'); }, 1650);
+      setTimeout(function () { cmd1.classList.add('show'); }, 166);
+      setTimeout(function () { cmd2.classList.add('show'); }, 520);
+      setTimeout(function () { cmd3.classList.add('show'); }, 858);
 
       var start = null;
       var lastShow = -1;
@@ -1641,5 +1727,37 @@
     })();
   </script>
 
+<script>
+(function(){
+  var cv=document.getElementById('stars'); if(!cv) return;
+  var ctx=cv.getContext('2d'),W,H,dpr,nodes=[],mouse={x:-9999,y:-9999,on:false},raf;
+  if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){cv.classList.add('lit');}
+  function size(){
+    dpr=Math.min(window.devicePixelRatio||1,2);W=window.innerWidth;H=window.innerHeight;
+    cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px';ctx.setTransform(dpr,0,0,dpr,0,0);
+    var count=Math.max(60,Math.min(160,Math.round(W*H/12000)));nodes=[];
+    for(var i=0;i<count;i++)nodes.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.38,vy:(Math.random()-.5)*.38,g:0.5+Math.random()*1.3});
+  }
+  function frame(){
+    ctx.clearRect(0,0,W,H);var i,j;
+    for(i=0;i<nodes.length;i++){var n=nodes[i];n.x+=n.vx;n.y+=n.vy;if(n.x<4||n.x>W-4)n.vx*=-1;if(n.y<4||n.y>H-4)n.vy*=-1;}
+    for(i=0;i<nodes.length;i++){var a=nodes[i],da=Math.hypot(a.x-mouse.x,a.y-mouse.y),near=mouse.on&&da<150;
+      if(near){
+        for(j=i+1;j<nodes.length;j++){var b=nodes[j],d=Math.hypot(a.x-b.x,a.y-b.y);
+          if(d<82){ctx.strokeStyle='rgba(176,168,230,'+(0.5*(1-d/82)*(1-da/150)).toFixed(2)+')';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}}
+        ctx.strokeStyle='rgba(176,168,230,'+(0.4*(1-da/150)).toFixed(2)+')';ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(mouse.x,mouse.y);ctx.stroke();
+      }
+      var base=0.17*a.g;
+      var br=near?Math.min(1,base+0.8*(1-da/150)):base;
+      var rad=1.5+a.g*0.42+(near?0.5*(1-da/150):0);
+      ctx.fillStyle='rgba(255,255,255,'+br.toFixed(2)+')';ctx.beginPath();ctx.arc(a.x,a.y,rad,0,6.28);ctx.fill();
+    }
+    raf=requestAnimationFrame(frame);
+  }
+  window.addEventListener('mousemove',function(e){mouse.x=e.clientX;mouse.y=e.clientY;mouse.on=true;});
+  window.addEventListener('blur',function(){mouse.on=false;});
+  size();window.addEventListener('resize',size);raf=requestAnimationFrame(frame);
+})();
+</script>
 </body>
 </html>
