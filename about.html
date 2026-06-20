@@ -192,6 +192,357 @@
     .charm.c-spark1  { width: 46px; top: -6px;  left: 56%; transform: rotate(-6deg); }
     .charm.c-star1   { width: 40px; top: 38%;  right: -1%; transform: rotate(14deg); }
     .charm.c-flower1 { width: 36px; bottom: 16%; left: 12%; transform: rotate(10deg); }
+    .charm.c-eight   { width: 30px; top: 16%;  left: 50%; transform: rotate(8deg); }
+    .charm.c-disco   { width: 36px; bottom: 14%; right: 3%; transform: rotate(0deg); }
+    .charm.c-spark2  { width: 24px; top: 6%;   left: 38%; transform: rotate(4deg); }
+    .charm.c-note    { width: 28px; top: 30%;  left: 5%;  transform: rotate(-14deg); }
+    .charm.c-bow     { width: 54px; top: -15px; left: 22%; transform: rotate(-8deg); }
+    @media (max-width: 820px) {
+      .charm.c-spark2, .charm.c-note { display: none; }
+    }
+
+    .polaroids { position: absolute; right: -2%; top: -12px; z-index: 2; width: 46%; height: 100%; }
+    .polaroid {
+      position: absolute; width: clamp(118px, 17vw, 158px);
+      background: #f5f4f1; padding: 9px 9px 0; border-radius: 2px;
+      box-shadow: 0 18px 34px -14px rgba(0,0,0,.7);
+    }
+    .polaroid .photo { width: 100%; aspect-ratio: 1; background: #0c0c0c; overflow: hidden; }
+    .polaroid .photo img { width:100%; height:100%; object-fit: cover; display:block; }
+    .polaroid figcaption { font-family: var(--hand); font-size: 16px; color: #2a2a2a; text-align: center; padding: 7px 4px 11px; line-height:1; }
+    .polaroid.pa { top: -16px; right: 4%; transform: rotate(7deg); }
+    .polaroid.pb { top: 32%; right: 30%; transform: rotate(-5deg); }
+    .polaroid.pc { top: 60%; right: 0%; transform: rotate(4deg); }
+
+    .liner { width: min(620px, 92vw); margin: 72px auto 0; }
+    .liner .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing:.14em; text-transform:uppercase; color: #ff6fae; margin-bottom: 12px; }
+    .liner h1 { font-family: var(--hand); font-weight: 400; color:#fff; font-size: clamp(40px,8vw,56px); line-height:.95; margin-bottom: 16px; }
+    .liner p { font-family: var(--mono); font-size: 14.5px; line-height: 1.75; color: rgba(255,255,255,.78); margin-bottom: 14px; }
+    .tracklist { margin-top: 26px; border-top: 1px solid rgba(255,255,255,.1); padding-top: 18px; }
+    .tracklist .tl-head { font-family: var(--mono); font-size: 11px; letter-spacing:.14em; text-transform:uppercase; color: rgba(255,255,255,.5); margin-bottom: 12px; }
+    .tracklist ol { list-style: none; counter-reset: t; display: grid; gap: 9px; }
+    .tracklist li { counter-increment: t; display: flex; align-items: baseline; gap: 12px; font-family: var(--mono); font-size: 13.5px; color: rgba(255,255,255,.82); }
+    .tracklist li::before { content: counter(t, decimal-leading-zero); color: #ff6fae; font-size: 11px; min-width: 22px; }
+    .tracklist li .dur { margin-left: auto; color: rgba(255,255,255,.4); font-size: 12px; }
+
+    @media (max-width: 820px) {
+      .hero { flex-direction: column; align-items: center; }
+      .polaroids { position: relative; right: auto; top: auto; width: 100%; height: auto;
+        display: flex; justify-content: center; flex-wrap: wrap; gap: 14px; margin-top: 56px; }
+      .polaroid { position: relative; top: auto !important; right: auto !important; }
+      .polaroid.pa { transform: rotate(4deg); } .polaroid.pb { transform: rotate(-4deg); } .polaroid.pc { transform: rotate(3deg); }
+      .spotlight { left: 50%; transform: translate(-50%,-50%); }
+    }
+    @media (prefers-reduced-motion: reduce) { .about { transition: none; transform: none; } }
+  </style>
+</head>
+
+<body>
+
+  <canvas id="stars" aria-hidden="true"></canvas>
+
+  <a class="site-mark" href="index.html" aria-label="Mahika Raj — home"><span class="mk-full">Mahika Raj</span><span class="mk-short">MR</span></a>
+  <nav class="site-nav" aria-label="Primary">
+    <a href="about.html" class="active">About</a>
+    <a href="projects.html">Projects</a>
+    <a href="blog.html">Blog</a>
+    <a href="games.html">Games</a>
+    <a href="contact.html">Contact me</a>
+  </nav>
+
+  <main class="about">
+    <div class="hero">
+      <div class="spotlight" aria-hidden="true"></div>
+
+      <div class="turntable">
+        <div class="record" id="record" role="img" aria-label="Spinnable vinyl record labelled Mahika Raj">
+          <div class="label">
+            <span class="l-name">Mahika Raj</span>
+            <span class="l-stereo">stereo</span>
+            <span class="spindle"></span>
+          </div>
+        </div>
+        <div class="tonearm" aria-hidden="true"><span class="arm"></span><span class="pivot"></span><span class="head"></span></div>
+        <button class="play-btn" id="playBtn" aria-label="Pause record">
+          <svg class="i-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg>
+          <svg class="i-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>
+        </button>
+      </div>
+
+      <div class="polaroids">
+        <figure class="polaroid pa"><div class="photo"></div><figcaption>first day @ gt</figcaption></figure>
+        <figure class="polaroid pb"><div class="photo"></div><figcaption>the lab</figcaption></figure>
+        <figure class="polaroid pc"><div class="photo"></div><figcaption>off the clock</figcaption></figure>
+      </div>
+
+      <div class="charms" aria-hidden="true">
+        <svg width="0" height="0" style="position:absolute"><defs>
+          <linearGradient id="chrome" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#ffffff"/><stop offset=".32" stop-color="#dcdce4"/>
+            <stop offset=".5" stop-color="#9aa0ad"/><stop offset=".68" stop-color="#cfd2da"/>
+            <stop offset="1" stop-color="#7a808d"/>
+          </linearGradient>
+          <linearGradient id="cpink" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#ffd1e8"/><stop offset=".5" stop-color="#ff6fae"/>
+            <stop offset="1" stop-color="#d94f93"/>
+          </linearGradient>
+        </defs></svg>
+
+        <svg class="charm c-spark1" viewBox="0 0 100 100"><path d="M50 2C56 38 62 44 98 50 62 56 56 62 50 98 44 62 38 56 2 50 38 44 44 38 50 2Z" fill="url(#chrome)"/></svg>
+        <svg class="charm c-star1" viewBox="0 0 100 100"><path d="M50 4 61 38 96 38 68 59 79 95 50 73 21 95 32 59 4 38 39 38Z" fill="url(#chrome)"/></svg>
+        <svg class="charm c-flower1" viewBox="0 0 100 100"><g fill="url(#chrome)"><circle cx="50" cy="24" r="18"/><circle cx="75" cy="42" r="18"/><circle cx="65" cy="72" r="18"/><circle cx="35" cy="72" r="18"/><circle cx="25" cy="42" r="18"/></g><circle cx="50" cy="50" r="12" fill="#2a2a30"/></svg>
+        <svg class="charm c-eight" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#141414"/><circle cx="50" cy="40" r="19" fill="#fff"/><text x="50" y="48" text-anchor="middle" font-size="22" font-weight="700" fill="#141414" font-family="Arial, sans-serif">8</text></svg>
+        <svg class="charm c-disco" viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="url(#chrome)"/><g stroke="rgba(0,0,0,.22)" stroke-width="1.4" fill="none"><path d="M8 34H92M6 50H94M8 66H92"/><path d="M30 9V91M50 6V94M70 9V91"/></g><circle cx="38" cy="34" r="6" fill="rgba(255,255,255,.7)"/></svg>
+        <svg class="charm c-spark2" viewBox="0 0 100 100"><path d="M50 2C56 38 62 44 98 50 62 56 56 62 50 98 44 62 38 56 2 50 38 44 44 38 50 2Z" fill="url(#cpink)"/></svg>
+        <svg class="charm c-note" viewBox="0 0 100 100"><g fill="url(#chrome)"><rect x="44" y="18" width="6" height="54"/><path d="M44 18C70 22 78 36 74 52 70 38 58 34 50 36Z"/><ellipse cx="33" cy="74" rx="16" ry="12"/></g></svg>
+        <svg class="charm c-bow" viewBox="0 0 100 100"><g fill="url(#chrome)"><path d="M45 55 33 87 41 80 46 89 50 57Z"/><path d="M55 55 67 87 59 80 54 89 50 57Z"/><path d="M49 50C33 32 8 33 11 50 8 67 33 68 49 50Z"/><path d="M51 50C67 32 92 33 89 50 92 67 67 68 51 50Z"/><rect x="43" y="43" width="14" height="16" rx="5"/></g></svg>
+      </div>
+    </div>
+
+    <section class="liner">
+      <p class="eyebrow">// liner notes</p>
+      <h1>About</h1>
+      <p>Hey there! I am Mahika, a Computer Science student at the Georgia Institute of Technology, with a minor in FinTech and concentrations in Intelligence and Cybersecurity.</p>
+      <p>My academic and professional interests center around artificial intelligence, machine learning, and building systems that solve real-world problems. I am currently involved in research across Emory University&rsquo;s ViTAL Lab, Georgia Tech&rsquo;s Jamali Lab, and SIGNAL@GT. My work spans movement-disorder modeling with gait motion-capture data, AI-driven research workflows, and a spatio-temporal diffusion project.</p>
+      <p>I&rsquo;m drawn to multidisciplinary work that brings together machine learning, research, and real-world problem solving &mdash; especially projects where I can explore complex questions through data, models, and experimentation.</p>
+      <p>Away from my laptop, I&rsquo;m usually cooking something new 🍳, planning my next hike 🥾, working on a craft project 🎀, or looking for a new place to explore ✈️. I like having a mix of structured work and creative outlets &mdash; it keeps things fun, a little chaotic, and gives me space to think differently 🌷.</p>
+      <p>This site? It&rsquo;s a mix of everything: research, projects 💻, thoughts, experiments 🧪, and probably a few random interests along the way. If you enjoy a little variety, welcome aboard 🎢!</p>
+
+      <div class="tracklist">
+        <div class="tl-head">on rotation</div>
+        <ol>
+          <li>Machine learning research <span class="dur">3:25</span></li>
+          <li>Course registration roulette <span class="dur">1:25</span></li>
+          <li>&ldquo;honeybee&rdquo; by Olivia Rodrigo on repeat <span class="dur">3:01</span></li>
+          <li>Glazing pottery at Paper &amp; Clay <span class="dur">2:24</span></li>
+        </ol>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">© 2026 Mahika Raj</footer>
+
+<!-- ===== Sweezy .ani cursor (verbatim from index.html) ===== -->
+  <script>
+    (function () {
+      var frames = ['data:image/png;base64,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','data:image/png;base64,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','data:image/png;base64,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','data:image/png;base64,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'];
+      var hotX = 1, hotY = 0, interval = 183;
+      if (!frames.length || !window.matchMedia('(pointer: fine)').matches) return;
+      var cursor = document.createElement('div');
+      cursor.id = 'sweezyAniCursor';
+      cursor.style.backgroundImage = 'url("' + frames[0] + '")';
+      document.body.appendChild(cursor);
+      var x = -100, y = -100, seen = false;
+      window.addEventListener('mousemove', function (e) {
+        x = e.clientX; y = e.clientY; seen = true;
+        cursor.style.transform = 'translate3d(' + (x - hotX) + 'px,' + (y - hotY) + 'px,0)';
+      }, { passive: true });
+      window.addEventListener('mouseleave', function () { cursor.style.opacity = '0'; });
+      window.addEventListener('mouseenter', function () { cursor.style.opacity = seen ? '1' : '0'; });
+      var i = 0;
+      setInterval(function () { i = (i + 1) % frames.length; cursor.style.backgroundImage = 'url("' + frames[i] + '")'; }, interval);
+    })();
+  </script>
+
+<!-- ===== constellation engine (verbatim from index.html) ===== -->
+  <script>
+  (function(){
+    var cv=document.getElementById('stars'); if(!cv) return;
+    var ctx=cv.getContext('2d'),W,H,dpr,nodes=[],mouse={x:-9999,y:-9999,on:false},raf;
+    if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){cv.classList.add('lit');}
+    function size(){
+      dpr=Math.min(window.devicePixelRatio||1,2);W=window.innerWidth;H=window.innerHeight;
+      cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px';ctx.setTransform(dpr,0,0,dpr,0,0);
+      var count=Math.max(60,Math.min(160,Math.round(W*H/12000)));nodes=[];
+      for(var i=0;i<count;i++)nodes.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.38,vy:(Math.random()-.5)*.38,g:0.5+Math.random()*1.3});
+    }
+    function frame(){
+      ctx.clearRect(0,0,W,H);var i,j;
+      for(i=0;i<nodes.length;i++){var n=nodes[i];n.x+=n.vx;n.y+=n.vy;if(n.x<4||n.x>W-4)n.vx*=-1;if(n.y<4||n.y>H-4)n.vy*=-1;}
+      for(i=0;i<nodes.length;i++){var a=nodes[i],da=Math.hypot(a.x-mouse.x,a.y-mouse.y),near=mouse.on&&da<150;
+        if(near){
+          for(j=i+1;j<nodes.length;j++){var b=nodes[j],d=Math.hypot(a.x-b.x,a.y-b.y);
+            if(d<82){ctx.strokeStyle='rgba(255,111,174,'+(0.5*(1-d/82)*(1-da/150)).toFixed(2)+')';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}}
+          ctx.strokeStyle='rgba(255,111,174,'+(0.4*(1-da/150)).toFixed(2)+')';ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(mouse.x,mouse.y);ctx.stroke();
+        }
+        var base=0.17*a.g;
+        var br=near?Math.min(1,base+0.8*(1-da/150)):base;
+        var rad=1.5+a.g*0.42+(near?0.5*(1-da/150):0);
+        ctx.fillStyle='rgba(255,255,255,'+br.toFixed(2)+')';ctx.beginPath();ctx.arc(a.x,a.y,rad,0,6.28);ctx.fill();
+      }
+      raf=requestAnimationFrame(frame);
+    }
+    window.addEventListener('mousemove',function(e){mouse.x=e.clientX;mouse.y=e.clientY;mouse.on=true;});
+    window.addEventListener('blur',function(){mouse.on=false;});
+    size();window.addEventListener('resize',size);raf=requestAnimationFrame(frame);
+    // no loader on this page — light the stars right away
+    requestAnimationFrame(function(){ cv.classList.add('lit'); });
+  })();
+  </script>
+
+  <script>
+    window.addEventListener('load', function () {
+      requestAnimationFrame(function () {
+        var nav = document.querySelector('.site-nav'); if (nav) nav.classList.add('show');
+        var mk = document.querySelector('.site-mark'); if (mk) mk.classList.add('show');
+        var ab = document.querySelector('.about'); if (ab) ab.classList.add('in');
+      });
+    });
+
+    (function () {
+      var record = document.getElementById('record');
+      var turntable = document.querySelector('.turntable');
+      var tonearm = document.querySelector('.tonearm');
+      var playBtn = document.getElementById('playBtn');
+      if (!record) return;
+
+      // disc spins by default; the button toggles it
+      var angle = 0, spinning = true, AUTO = 1.2;
+      function spin() {
+        if (spinning) angle += AUTO;
+        record.style.transform = 'rotate(' + angle + 'deg)';
+        requestAnimationFrame(spin);
+      }
+      requestAnimationFrame(spin);
+      if (playBtn) {
+        playBtn.addEventListener('click', function () {
+          spinning = !spinning;
+          playBtn.classList.toggle('paused', !spinning);
+          playBtn.setAttribute('aria-label', spinning ? 'Pause record' : 'Play record');
+        });
+      }
+
+    })();
+  </script>
+</body>
+</html>    }
+    .site-nav.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .site-nav a {
+      font-family: var(--mono); font-size: clamp(12.5px, 1.4vw, 15px); letter-spacing: .04em;
+      color: rgba(255, 255, 255, .8); text-decoration: none; position: relative; padding: 4px 2px;
+      opacity: 0; transform: translateY(-7px);
+      transition: opacity .5s ease, transform .55s cubic-bezier(.16, 1, .3, 1), color .25s ease;
+    }
+    .site-nav.show a { opacity: 1; transform: none; }
+    .site-nav.show a:nth-child(1) { transition-delay: .10s; }
+    .site-nav.show a:nth-child(2) { transition-delay: .18s; }
+    .site-nav.show a:nth-child(3) { transition-delay: .26s; }
+    .site-nav.show a:nth-child(4) { transition-delay: .34s; }
+    .site-nav.show a:nth-child(5) { transition-delay: .42s; }
+    .site-nav a:hover { color: #fff; }
+    .site-nav a::after {
+      content: ""; position: absolute; left: 2px; right: 2px; bottom: 0; height: 1.5px;
+      background: currentColor; transform: scaleX(0); transform-origin: left center;
+      transition: transform .3s ease;
+    }
+    .site-nav a:hover::after { transform: scaleX(1); }
+    .site-nav a.active { color: #fff; }
+    .site-nav a.active::after { transform: scaleX(1); background: rgba(255,255,255,.85); }
+    @media (prefers-reduced-motion: reduce) {
+      .site-nav, .site-nav a { transition: none; transform: none; }
+    }
+
+    .site-mark {
+      position: fixed; top: 0; left: 0; z-index: 41;
+      padding: clamp(10px, 2.2vw, 18px) 26px;
+      font-family: var(--hand); font-size: clamp(25px, 3.2vw, 30px); font-weight: 400;
+      letter-spacing: 0; color: rgba(255,255,255,.92); text-decoration: none;
+      opacity: 0; transform: translateY(-130%);
+      transition: opacity .55s ease, transform .75s cubic-bezier(.16,1,.3,1), color .25s ease;
+    }
+    .site-mark.show { opacity: 1; transform: translateY(0); }
+    .site-mark:hover { color: #fff; }
+    .site-mark .mk-short { display: none; }
+    @media (max-width: 560px) {
+      .site-mark .mk-full { display: none; }
+      .site-mark .mk-short { display: inline; }
+    }
+    @media (prefers-reduced-motion: reduce) { .site-mark { transition: none; transform: none; } }
+
+    .site-footer {
+      position: fixed; left: 0; right: 0; bottom: 16px; text-align: center; z-index: 35;
+      font-family: var(--mono); font-size: 11px; letter-spacing: .05em;
+      color: rgba(255,255,255,.45); pointer-events: none;
+    }
+
+    /* ===== about: turntable + polaroids + liner notes ===== */
+    .about {
+      position: relative; z-index: 5; min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+      padding: 172px 22px 90px;
+      opacity: 0; transform: translateY(16px);
+      transition: opacity .8s ease, transform .8s cubic-bezier(.16,1,.3,1);
+    }
+    .about.in { opacity: 1; transform: none; }
+
+    .hero { position: relative; width: min(680px, 94vw); display: flex; justify-content: center; }
+
+    .spotlight {
+      position: absolute; left: 6%; top: 50%; width: 440px; height: 440px; transform: translateY(-50%);
+      background: radial-gradient(circle, rgba(240,107,163,.2), transparent 62%);
+      filter: blur(8px); pointer-events: none; z-index: 0;
+    }
+
+    .turntable { position: relative; z-index: 1; }
+
+    .record {
+      width: clamp(260px, 38vw, 360px); aspect-ratio: 1; border-radius: 50%;
+      background:
+        repeating-radial-gradient(circle at 50% 50%, #f6a4c8 0 1.4px, #e56a9f 1.4px 3px),
+        #ef82b3;
+      box-shadow: 0 36px 70px -24px rgba(120,20,60,.5), inset 0 0 70px rgba(150,40,90,.35);
+      display: grid; place-items: center; position: relative;
+      will-change: transform; touch-action: none;
+    }
+    .record.grabbing { cursor: grabbing; }
+    .record::after {
+      content:""; position:absolute; inset:0; border-radius:50%;
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.04), inset 0 0 22px rgba(255,255,255,.03);
+      pointer-events:none;
+    }
+
+    .label {
+      width: 42%; aspect-ratio: 1; border-radius: 50%;
+      background: radial-gradient(circle at 50% 42%, #f8f2e8, #ead9c4 82%);
+      display: grid; place-items: center; text-align: center;
+      color: #a4406d; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12), 0 2px 6px rgba(0,0,0,.35);
+      position: relative; padding: 6px;
+    }
+    .label .l-top { font-family: var(--mono); font-size: 8px; letter-spacing: .22em; text-transform: uppercase; opacity:.85; }
+    .label .l-name { font-family: var(--mono); font-weight: 700; font-size: clamp(12px,1.6vw,15px); letter-spacing:.01em; line-height:1.05; margin: 3px 0; }
+    .label .l-role { font-family: var(--mono); font-size: 8.5px; letter-spacing:.04em; opacity:.92; }
+    .label .l-stereo { font-family: var(--mono); font-size: 7.5px; letter-spacing:.3em; text-transform:uppercase; opacity:.7; margin-top: 3px; }
+    .spindle { position:absolute; width: 9px; height:9px; border-radius:50%; background:#0a0a0a; box-shadow: inset 0 0 0 1px rgba(255,255,255,.25); }
+
+    .tonearm {
+      position: absolute; top: 7%; right: 6%; z-index: 3; pointer-events: none;
+      width: 42%; height: 20px; transform-origin: 100% 50%; transform: rotate(30deg);
+    }
+    .tonearm .arm { position:absolute; right:5px; top:50%; transform:translateY(-50%); width:calc(100% - 10px); height:4px; background: linear-gradient(#e8e8ee,#9a9aa6); border-radius:3px; box-shadow:0 1px 2px rgba(0,0,0,.45); }
+    .tonearm .pivot { position:absolute; right:-6px; top:50%; transform:translateY(-50%); width:18px; height:18px; border-radius:50%; background: radial-gradient(circle at 40% 35%, #eaeaf0, #9aa0ad); box-shadow:0 2px 5px rgba(0,0,0,.5); }
+    .tonearm .head { position:absolute; left:-2px; top:50%; transform:translateY(-50%); width:14px; height:12px; background:#2a2a30; border-radius:2px; box-shadow:0 1px 2px rgba(0,0,0,.5); }
+
+    .play-btn {
+      position: absolute; left: 50%; bottom: -22px; transform: translateX(-50%); z-index: 4;
+      width: 44px; height: 44px; border-radius: 50%; border: none; cursor: pointer;
+      background: #f06ba3; color: #fff; display: grid; place-items: center;
+      box-shadow: 0 8px 20px -6px rgba(240,107,163,.6);
+      transition: transform .15s ease, background .18s ease;
+    }
+    .play-btn:hover { background: #e2588f; transform: translateX(-50%) translateY(-2px); }
+    .play-btn svg { width: 16px; height: 16px; }
+    .play-btn .i-play { display: none; }
+    .play-btn.paused .i-pause { display: none; }
+    .play-btn.paused .i-play { display: block; }
+
+    .hint { margin-top: 46px; text-align: center; font-family: var(--mono); font-size: 11px; letter-spacing:.05em; color: rgba(255,255,255,.4); }
+
+    /* ===== charms / stickers ===== */
+    .charms { position: absolute; inset: -26px -12px; z-index: 6; pointer-events: none; }
+    .charm { position: absolute; filter: drop-shadow(0 4px 7px rgba(0,0,0,.55)); }
+    .charm.c-spark1  { width: 46px; top: -6px;  left: 56%; transform: rotate(-6deg); }
+    .charm.c-star1   { width: 40px; top: 38%;  right: -1%; transform: rotate(14deg); }
+    .charm.c-flower1 { width: 36px; bottom: 16%; left: 12%; transform: rotate(10deg); }
     .charm.c-flower2 { width: 30px; top: 58%;  left: 50%; transform: rotate(-12deg); }
     .charm.c-eight   { width: 30px; top: 16%;  left: 50%; transform: rotate(8deg); }
     .charm.c-disco   { width: 36px; bottom: 14%; right: 3%; transform: rotate(0deg); }
