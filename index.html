@@ -1372,6 +1372,7 @@
     .site-nav.show a:nth-child(2) { transition-delay: .18s; }
     .site-nav.show a:nth-child(3) { transition-delay: .26s; }
     .site-nav.show a:nth-child(4) { transition-delay: .34s; }
+    .site-nav.show a:nth-child(5) { transition-delay: .42s; }
     .site-nav a:hover { color: #fff; }
     .site-nav a::after {
       content: "";
@@ -1387,6 +1388,31 @@
     @media (prefers-reduced-motion: reduce) {
       .site-nav, .site-nav a { transition: none; transform: none; }
     }
+    .site-footer { position: fixed; left: 0; right: 0; bottom: 16px; text-align: center; z-index: 35;
+      font-family: var(--mono); font-size: 11px; letter-spacing: .05em; color: rgba(17,17,17,.55);
+      transition: color 1s ease; pointer-events: none; }
+    .site-footer.lit { color: rgba(255,255,255,.45); }
+    .overlay { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center;
+      padding: 24px; background: rgba(6,5,12,.74); opacity: 0; pointer-events: none; transition: opacity .35s ease; }
+    .overlay.show { opacity: 1; pointer-events: auto; }
+    .panel { position: relative; width: min(560px,100%); max-height: 82vh; overflow: auto;
+      background: rgba(18,16,26,.94); border: 1px solid rgba(176,168,230,.3); border-radius: 16px;
+      padding: 32px 30px 34px; transform: translateY(14px) scale(.985); transition: transform .35s cubic-bezier(.16,1,.3,1); }
+    .overlay.show .panel { transform: none; }
+    .panel-close { position: absolute; top: 12px; right: 15px; background: none; border: none;
+      color: rgba(255,255,255,.6); font-size: 24px; line-height: 1; }
+    .panel-close:hover { color: #fff; }
+    .pl-title { font-family: var(--hand); font-size: 40px; color: #fff; margin: 0 0 16px; line-height: 1; }
+    .pl-text { font-family: var(--mono); font-size: 13.5px; line-height: 1.75; color: rgba(255,255,255,.82); margin: 0 0 16px; }
+    .pl-text em { color: rgba(176,168,230,.95); font-style: normal; }
+    .pl-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pl-tags span { font-family: var(--mono); font-size: 12px; color: #cbc6f2; border: 1px solid rgba(176,168,230,.4); border-radius: 999px; padding: 3px 11px; }
+    .pl-links { display: flex; flex-direction: column; }
+    .pl-links a { font-family: var(--mono); font-size: 14px; color: rgba(255,255,255,.85); text-decoration: none;
+      padding: 12px 4px; border-bottom: 1px solid rgba(255,255,255,.08); display: flex; gap: 12px; align-items: baseline; }
+    .pl-links a:last-child { border-bottom: none; }
+    .pl-links a b { color: #b0a8e6; min-width: 78px; font-size: 12px; font-weight: 500; letter-spacing: .04em; }
+    .pl-links a:hover { color: #fff; }
   </style>
 </head>
 
@@ -1415,8 +1441,11 @@
     <a href="#about">About</a>
     <a href="#projects">Projects</a>
     <a href="#blog">Blog</a>
-    <a href="#contact">Contact me</a>
+    <a href="#games">Games</a>
+    <a href="contact.html">Contact me</a>
   </nav>
+
+  <footer class="site-footer">© 2026 Mahika Raj</footer>
 
   <!-- UNIFIED LOADER + NPM RUN BUILD -->
   <div id="loader">
@@ -1581,6 +1610,7 @@
 
         setTimeout(function () {
           codeScreen.classList.add('dark');
+          var ftd = document.querySelector('.site-footer'); if (ftd) ftd.classList.add('lit');
         }, 322);
 
         setTimeout(function () {
@@ -1637,7 +1667,7 @@
               setTimeout(function () { ln.classList.add('fade'); }, idx * 45);
             })(lanes[i], i);
           }
-        }, 4900);
+        }, 3500);
 
         setTimeout(function () {
           if (assembly) assembly.classList.add('resolve');
@@ -1646,14 +1676,14 @@
         setTimeout(function () {
           var st = document.getElementById('stars'); if (st) st.classList.add('lit');
           codeScreen.classList.add('gone');
-        }, 7100);
+        }, 5500);
 
         setTimeout(function () {
           codeScreen.style.display = 'none';
           codeScreen.classList.remove('dark');
           codeScreen.classList.remove('gone');
           codeScreen.innerHTML = '';
-        }, 8500);
+        }, 7000);
       }
 
       if (reduce) {
@@ -1662,6 +1692,7 @@
         home.classList.add('settled');
         content.classList.add('show');
           if (siteNav) siteNav.classList.add('show');
+          var ftr = document.querySelector('.site-footer'); if (ftr) ftr.classList.add('lit');
         return;
       }
 
@@ -1759,5 +1790,42 @@
   size();window.addEventListener('resize',size);raf=requestAnimationFrame(frame);
 })();
 </script>
+  <div class="overlay" id="overlay" aria-hidden="true">
+    <div class="panel" role="dialog" aria-modal="true">
+      <button class="panel-close" id="panelClose" aria-label="Close">&times;</button>
+      <div id="panelBody"></div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    var ov=document.getElementById('overlay'),body=document.getElementById('panelBody'),cl=document.getElementById('panelClose');
+    if(!ov) return;
+    var DATA={
+      about:`<h2 class="pl-title">About</h2>
+        <p class="pl-text">I'm Mahika Raj — a Computer Science student at Georgia Tech, drawn to machine learning and the systems around it. <em>[Replace this with 2-3 sentences: what you research, what you're building, and what you're curious about.]</em></p>
+        <div class="pl-tags"><span>PyTorch</span><span>NLP</span><span>Reinforcement learning</span><span>Research</span></div>`,
+      contact:`<h2 class="pl-title">Contact</h2>
+        <p class="pl-text">Let's connect — happy to chat about research, projects, or anything in between.</p>
+        <div class="pl-links">
+          <a href="mailto:mraj39@gatech.edu"><b>Email</b> mraj39@gatech.edu</a>
+          <a href="https://github.com/Mahika-raj" target="_blank" rel="noopener"><b>GitHub</b> github.com/Mahika-raj</a>
+          <a href="https://www.linkedin.com/in/mahikaraj2024/" target="_blank" rel="noopener"><b>LinkedIn</b> linkedin.com/in/mahikaraj2024</a>
+        </div>`
+    };
+    function open(k){ if(!DATA[k]) return; body.innerHTML=DATA[k]; ov.classList.add('show'); ov.setAttribute('aria-hidden','false'); }
+    function close(){ ov.classList.remove('show'); ov.setAttribute('aria-hidden','true'); }
+    document.querySelectorAll('.site-nav a').forEach(function(a){
+      a.addEventListener('click',function(e){
+        var href=(a.getAttribute('href')||'');
+        if(href.charAt(0)!=='#') return;   // real page link (e.g. contact.html) -> let it navigate
+        e.preventDefault(); open(href.replace('#',''));
+      });
+    });
+    cl.addEventListener('click',close);
+    ov.addEventListener('click',function(e){ if(e.target===ov) close(); });
+    window.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
+  })();
+  </script>
 </body>
 </html>
