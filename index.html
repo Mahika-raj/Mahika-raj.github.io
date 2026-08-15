@@ -4,11 +4,26 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mahika Raj</title>
-  <!-- Real uploaded Sweezy .ani cursor used through extracted animated frames. -->
+  <meta name="description" content="Mahika Raj is an AI/ML researcher and Computer Science student at Georgia Tech. Research in generative audio, grounded retrieval, and clinical time series." />
+  <link rel="canonical" href="https://mahikaraj.com/" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Mahika Raj" />
+  <meta property="og:title" content="Mahika Raj" />
+  <meta property="og:description" content="AI/ML researcher and Computer Science student at Georgia Tech." />
+  <meta property="og:url" content="https://mahikaraj.com/" />
+  <meta property="og:image" content="https://mahikaraj.com/assets/og-card.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="alternate icon" href="assets/favicon.ico" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Butterfly+Kids&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Shared chrome first, so the page's own rules below always win. -->
+  <link rel="stylesheet" href="assets/site.css" />
 
   <style>
     :root {
@@ -22,11 +37,12 @@
       --name-size: clamp(48px, 12vw, 110px);
       --soft-ease: cubic-bezier(.25, .8, .25, 1);
 
-      /* pixel-art cursor (hotspot at the tip: 6 1) */
-      --cursor: none;
+      /* Home runs periwinkle. --accent-rgb tints the constellation lines. */
+      --accent:      #b0a8e6;
+      --accent-rgb:  176, 168, 230;
+      --accent-deep: #8f85d6;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; cursor: var(--cursor); }
     html, body { height: 100%; background: var(--home-bg); overflow: hidden; }
 
     .reveal-wrap {
@@ -1306,113 +1322,15 @@
       margin: 0 !important;
     }
 
-    /* ===================== REAL SWEEZY .ANI CURSOR ===================== */
-    /* Uses the uploaded .ani file by extracting its 32x32 animated frames.
-       Native CSS cursor cannot reliably play .ani in modern browsers, so this
-       hides the system cursor and draws the real ANI frames as a custom cursor. */
-    * {
-      cursor: none !important;
+    /* The nav, wordmark, cursor and star canvas styles now live in
+       assets/site.css. Only the footer differs here: on the home page it
+       starts dark against the white loader and warms to white once the
+       code screen goes black. */
+    .site-footer {
+      color: rgba(17,17,17,.55);
+      transition: color 1s ease;
     }
-
-    #sweezyAniCursor {
-      position: fixed;
-      left: 0;
-      top: 0;
-      width: 32px;
-      height: 32px;
-      pointer-events: none;
-      z-index: 2147483647;
-      background-repeat: no-repeat;
-      background-position: 0 0;
-      background-size: 32px 32px;
-      transform: translate3d(-100px, -100px, 0);
-      will-change: transform, background-image;
-    }
-
-    @media (pointer: coarse) {
-      * { cursor: auto !important; }
-      #sweezyAniCursor { display: none !important; }
-    }
-
-
-    /* ---- top navigation: slides in when the home screen lands ---- */
-    .site-nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 40;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: clamp(16px, 4vw, 46px);
-      padding: clamp(16px, 3vw, 26px) 24px;
-      opacity: 0;
-      transform: translateY(-130%);
-      transition: opacity .55s ease, transform .75s cubic-bezier(.16, 1, .3, 1);
-      pointer-events: none;
-    }
-    .site-nav.show {
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events: auto;
-    }
-    .site-nav a {
-      font-family: var(--mono);
-      font-size: clamp(12.5px, 1.4vw, 15px);
-      letter-spacing: .04em;
-      color: rgba(255, 255, 255, .8);
-      text-decoration: none;
-      position: relative;
-      padding: 4px 2px;
-      opacity: 0;
-      transform: translateY(-7px);
-      transition: opacity .5s ease, transform .55s cubic-bezier(.16, 1, .3, 1), color .25s ease;
-    }
-    .site-nav.show a { opacity: 1; transform: none; }
-    .site-nav.show a:nth-child(1) { transition-delay: .10s; }
-    .site-nav.show a:nth-child(2) { transition-delay: .18s; }
-    .site-nav.show a:nth-child(3) { transition-delay: .26s; }
-    .site-nav.show a:nth-child(4) { transition-delay: .34s; }
-    .site-nav.show a:nth-child(5) { transition-delay: .42s; }
-    .site-nav a:hover { color: #fff; }
-    .site-nav a::after {
-      content: "";
-      position: absolute;
-      left: 2px; right: 2px; bottom: 0;
-      height: 1.5px;
-      background: currentColor;
-      transform: scaleX(0);
-      transform-origin: left center;
-      transition: transform .3s ease;
-    }
-    .site-nav a:hover::after { transform: scaleX(1); }
-    @media (prefers-reduced-motion: reduce) {
-      .site-nav, .site-nav a { transition: none; transform: none; }
-    }
-    .site-footer { position: fixed; left: 0; right: 0; bottom: 16px; text-align: center; z-index: 35;
-      font-family: var(--mono); font-size: 11px; letter-spacing: .05em; color: rgba(17,17,17,.55);
-      transition: color 1s ease; pointer-events: none; }
     .site-footer.lit { color: rgba(255,255,255,.45); }
-    .overlay { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center;
-      padding: 24px; background: rgba(6,5,12,.74); opacity: 0; pointer-events: none; transition: opacity .35s ease; }
-    .overlay.show { opacity: 1; pointer-events: auto; }
-    .panel { position: relative; width: min(560px,100%); max-height: 82vh; overflow: auto;
-      background: rgba(18,16,26,.94); border: 1px solid rgba(176,168,230,.3); border-radius: 16px;
-      padding: 32px 30px 34px; transform: translateY(14px) scale(.985); transition: transform .35s cubic-bezier(.16,1,.3,1); }
-    .overlay.show .panel { transform: none; }
-    .panel-close { position: absolute; top: 12px; right: 15px; background: none; border: none;
-      color: rgba(255,255,255,.6); font-size: 24px; line-height: 1; }
-    .panel-close:hover { color: #fff; }
-    .pl-title { font-family: var(--hand); font-size: 40px; color: #fff; margin: 0 0 16px; line-height: 1; }
-    .pl-text { font-family: var(--mono); font-size: 13.5px; line-height: 1.75; color: rgba(255,255,255,.82); margin: 0 0 16px; }
-    .pl-text em { color: rgba(176,168,230,.95); font-style: normal; }
-    .pl-tags { display: flex; flex-wrap: wrap; gap: 8px; }
-    .pl-tags span { font-family: var(--mono); font-size: 12px; color: #cbc6f2; border: 1px solid rgba(176,168,230,.4); border-radius: 999px; padding: 3px 11px; }
-    .pl-links { display: flex; flex-direction: column; }
-    .pl-links a { font-family: var(--mono); font-size: 14px; color: rgba(255,255,255,.85); text-decoration: none;
-      padding: 12px 4px; border-bottom: 1px solid rgba(255,255,255,.08); display: flex; gap: 12px; align-items: baseline; }
-    .pl-links a:last-child { border-bottom: none; }
-    .pl-links a b { color: #b0a8e6; min-width: 78px; font-size: 12px; font-weight: 500; letter-spacing: .04em; }
-    .pl-links a:hover { color: #fff; }
   </style>
 </head>
 
@@ -1428,7 +1346,9 @@
 
   <div class="reveal-wrap">
     <div id="home"></div>
-    <canvas id="stars" aria-hidden="true"></canvas>
+    <!-- data-manual-lit: the intro sequence below fades this in on its own
+         schedule, once the code rain has cleared. -->
+    <canvas id="stars" aria-hidden="true" data-manual-lit></canvas>
     <div id="codeScreen" aria-hidden="true"></div>
   </div>
 
@@ -1439,9 +1359,9 @@
 
   <nav class="site-nav" aria-label="Primary">
     <a href="about.html">About</a>
-    <a href="#projects">Projects</a>
-    <a href="#blog">Blog</a>
-    <a href="#games">Games</a>
+    <a href="research.html">Research</a>
+    <a href="projects.html">Projects</a>
+    <a href="games.html">Games</a>
     <a href="contact.html">Contact me</a>
   </nav>
 
@@ -1658,8 +1578,8 @@
           if (assembly) assembly.classList.add('lock');
         }, 1700);
 
-        // Let the code linger behind the name, then dissolve away gradually —
-        // lane by lane — into clean dark.
+        // Let the code linger behind the name, then dissolve away gradually,
+        // lane by lane, into clean dark.
         setTimeout(function () {
           var lanes = codeScreen.querySelectorAll('.code-lane');
           for (var i = 0; i < lanes.length; i++) {
@@ -1722,110 +1642,9 @@
       requestAnimationFrame(frame);
     })();
   </script>
-  <script>
-    (function () {
-      var frames = ['data:image/png;base64,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','data:image/png;base64,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','data:image/png;base64,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','data:image/png;base64,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'];
-      var hotX = 1;
-      var hotY = 0;
-      var interval = 183;
-      if (!frames.length || !window.matchMedia('(pointer: fine)').matches) return;
-
-      var cursor = document.createElement('div');
-      cursor.id = 'sweezyAniCursor';
-      cursor.style.backgroundImage = 'url("' + frames[0] + '")';
-      document.body.appendChild(cursor);
-
-      var x = -100, y = -100, seen = false;
-      window.addEventListener('mousemove', function (e) {
-        x = e.clientX;
-        y = e.clientY;
-        seen = true;
-        cursor.style.transform = 'translate3d(' + (x - hotX) + 'px,' + (y - hotY) + 'px,0)';
-      }, { passive: true });
-
-      window.addEventListener('mouseleave', function () {
-        cursor.style.opacity = '0';
-      });
-      window.addEventListener('mouseenter', function () {
-        cursor.style.opacity = seen ? '1' : '0';
-      });
-
-      var i = 0;
-      setInterval(function () {
-        i = (i + 1) % frames.length;
-        cursor.style.backgroundImage = 'url("' + frames[i] + '")';
-      }, interval);
-    })();
-  </script>
-
-<script>
-(function(){
-  var cv=document.getElementById('stars'); if(!cv) return;
-  var ctx=cv.getContext('2d'),W,H,dpr,nodes=[],mouse={x:-9999,y:-9999,on:false},raf;
-  if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){cv.classList.add('lit');}
-  function size(){
-    dpr=Math.min(window.devicePixelRatio||1,2);W=window.innerWidth;H=window.innerHeight;
-    cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px';ctx.setTransform(dpr,0,0,dpr,0,0);
-    var count=Math.max(60,Math.min(160,Math.round(W*H/12000)));nodes=[];
-    for(var i=0;i<count;i++)nodes.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.38,vy:(Math.random()-.5)*.38,g:0.5+Math.random()*1.3});
-  }
-  function frame(){
-    ctx.clearRect(0,0,W,H);var i,j;
-    for(i=0;i<nodes.length;i++){var n=nodes[i];n.x+=n.vx;n.y+=n.vy;if(n.x<4||n.x>W-4)n.vx*=-1;if(n.y<4||n.y>H-4)n.vy*=-1;}
-    for(i=0;i<nodes.length;i++){var a=nodes[i],da=Math.hypot(a.x-mouse.x,a.y-mouse.y),near=mouse.on&&da<150;
-      if(near){
-        for(j=i+1;j<nodes.length;j++){var b=nodes[j],d=Math.hypot(a.x-b.x,a.y-b.y);
-          if(d<82){ctx.strokeStyle='rgba(176,168,230,'+(0.5*(1-d/82)*(1-da/150)).toFixed(2)+')';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}}
-        ctx.strokeStyle='rgba(176,168,230,'+(0.4*(1-da/150)).toFixed(2)+')';ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(mouse.x,mouse.y);ctx.stroke();
-      }
-      var base=0.17*a.g;
-      var br=near?Math.min(1,base+0.8*(1-da/150)):base;
-      var rad=1.5+a.g*0.42+(near?0.5*(1-da/150):0);
-      ctx.fillStyle='rgba(255,255,255,'+br.toFixed(2)+')';ctx.beginPath();ctx.arc(a.x,a.y,rad,0,6.28);ctx.fill();
-    }
-    raf=requestAnimationFrame(frame);
-  }
-  window.addEventListener('mousemove',function(e){mouse.x=e.clientX;mouse.y=e.clientY;mouse.on=true;});
-  window.addEventListener('blur',function(){mouse.on=false;});
-  size();window.addEventListener('resize',size);raf=requestAnimationFrame(frame);
-})();
-</script>
-  <div class="overlay" id="overlay" aria-hidden="true">
-    <div class="panel" role="dialog" aria-modal="true">
-      <button class="panel-close" id="panelClose" aria-label="Close">&times;</button>
-      <div id="panelBody"></div>
-    </div>
-  </div>
-
-  <script>
-  (function(){
-    var ov=document.getElementById('overlay'),body=document.getElementById('panelBody'),cl=document.getElementById('panelClose');
-    if(!ov) return;
-    var DATA={
-      about:`<h2 class="pl-title">About</h2>
-        <p class="pl-text">I'm Mahika Raj — a Computer Science student at Georgia Tech, drawn to machine learning and the systems around it. <em>[Replace this with 2-3 sentences: what you research, what you're building, and what you're curious about.]</em></p>
-        <div class="pl-tags"><span>PyTorch</span><span>NLP</span><span>Reinforcement learning</span><span>Research</span></div>`,
-      contact:`<h2 class="pl-title">Contact</h2>
-        <p class="pl-text">Let's connect — happy to chat about research, projects, or anything in between.</p>
-        <div class="pl-links">
-          <a href="mailto:mraj39@gatech.edu"><b>Email</b> mraj39@gatech.edu</a>
-          <a href="https://github.com/Mahika-raj" target="_blank" rel="noopener"><b>GitHub</b> github.com/Mahika-raj</a>
-          <a href="https://www.linkedin.com/in/mahikaraj2024/" target="_blank" rel="noopener"><b>LinkedIn</b> linkedin.com/in/mahikaraj2024</a>
-        </div>`
-    };
-    function open(k){ if(!DATA[k]) return; body.innerHTML=DATA[k]; ov.classList.add('show'); ov.setAttribute('aria-hidden','false'); }
-    function close(){ ov.classList.remove('show'); ov.setAttribute('aria-hidden','true'); }
-    document.querySelectorAll('.site-nav a').forEach(function(a){
-      a.addEventListener('click',function(e){
-        var href=(a.getAttribute('href')||'');
-        if(href.charAt(0)!=='#') return;   // real page link (e.g. contact.html) -> let it navigate
-        e.preventDefault(); open(href.replace('#',''));
-      });
-    });
-    cl.addEventListener('click',close);
-    ov.addEventListener('click',function(e){ if(e.target===ov) close(); });
-    window.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
-  })();
-  </script>
+  <!-- Shared: pixel cursor, constellation field. The intro sequence above
+       drives the nav and the star fade-in itself, so nav.js is not loaded. -->
+  <script src="assets/cursor.js"></script>
+  <script src="assets/stars.js"></script>
 </body>
 </html>

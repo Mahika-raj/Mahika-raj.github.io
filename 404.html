@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Not found | Mahika Raj</title>
+  <meta name="description" content="That page isn't here." />
+  <meta name="robots" content="noindex" />
+
+  <!-- GitHub Pages serves this file for ANY missing path, including nested ones
+       like /a/b/c. Every href here is root-absolute so it still resolves. -->
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+  <link rel="alternate icon" href="/assets/favicon.ico" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Butterfly+Kids&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/assets/site.css" />
+
+  <style>
+    :root {
+      --accent:      #b0a8e6;
+      --accent-rgb:  176, 168, 230;
+      --accent-deep: #8f85d6;
+    }
+
+    html, body { min-height: 100%; background: var(--home-bg); }
+    body { font-family: var(--mono); color: var(--home-text); -webkit-font-smoothing: antialiased; }
+
+    .lost {
+      position: relative; z-index: 5; min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 140px 22px 96px;
+      opacity: 0; transition: opacity .8s ease;
+    }
+    .lost.in { opacity: 1; }
+    @media (prefers-reduced-motion: reduce) { .lost { transition: none; } }
+
+    .code {
+      font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 16px;
+    }
+    .lost h1 {
+      font-family: var(--hand); font-weight: 400; color: #fff;
+      font-size: clamp(44px, 10vw, 76px); line-height: .95; margin-bottom: 18px;
+    }
+    .lost p {
+      font-size: 14px; line-height: 1.75; color: rgba(255,255,255,.68);
+      max-width: 46ch; margin-bottom: 32px;
+    }
+    .go { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+    .go a {
+      font-size: 13px; letter-spacing: .02em; text-decoration: none;
+      color: rgba(255,255,255,.85); border: 1px solid rgba(255,255,255,.22);
+      border-radius: 10px; padding: 10px 17px;
+      transition: color .18s ease, border-color .18s ease, transform .14s ease;
+    }
+    .go a:hover { color: #fff; border-color: rgba(255,255,255,.45); transform: translateY(-1px); }
+    .go a.primary { color: #14121d; background: var(--accent); border-color: var(--accent); }
+    .go a.primary:hover { background: #c3bcf0; }
+  </style>
+</head>
+
+<body>
+
+  <canvas id="stars" aria-hidden="true"></canvas>
+
+  <a class="site-mark" href="/index.html" aria-label="Mahika Raj, home"><span class="mk-full">Mahika Raj</span><span class="mk-short">MR</span></a>
+  <nav class="site-nav" aria-label="Primary">
+    <a href="/about.html">About</a>
+    <a href="/research.html">Research</a>
+    <a href="/projects.html">Projects</a>
+    <a href="/games.html">Games</a>
+    <a href="/contact.html">Contact me</a>
+  </nav>
+
+  <main class="lost">
+    <p class="code">error 404</p>
+    <h1>Nothing here</h1>
+    <p>
+      There are 88 constellations and none of them is this one. The page you
+      were after has either moved or never existed.
+    </p>
+    <div class="go">
+      <a class="primary" href="/index.html">Back home</a>
+      <a href="/research.html">Research</a>
+      <a href="/projects.html">Projects</a>
+      <a href="/contact.html">Contact</a>
+    </div>
+  </main>
+
+  <footer class="site-footer">© 2026 Mahika Raj</footer>
+
+  <script src="/assets/cursor.js"></script>
+  <script src="/assets/stars.js"></script>
+  <script src="/assets/nav.js"></script>
+  <script>
+    window.addEventListener('load', function () {
+      requestAnimationFrame(function () { document.querySelector('.lost').classList.add('in'); });
+    });
+  </script>
+</body>
+</html>
