@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Projects | Mahika Raj</title>
+  <meta name="description" content="Projects by Mahika Raj: a fuel-aware vision-language UAV navigation pipeline, a multi-agent LLM system with tool-calling, and VeriStack, a feature-registry backend for real-time ML inference." />
+  <link rel="canonical" href="https://mahikaraj.com/projects.html" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Mahika Raj" />
+  <meta property="og:title" content="Projects | Mahika Raj" />
+  <meta property="og:description" content="A vision-language UAV navigation pipeline, a multi-agent LLM system with tool-calling, and a feature-registry backend for real-time ML inference." />
+  <meta property="og:url" content="https://mahikaraj.com/projects.html" />
+  <meta property="og:image" content="https://mahikaraj.com/assets/og-card.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="alternate icon" href="assets/favicon.ico" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Butterfly+Kids&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/site.css" />
+
+  <style>
+    /* Projects runs violet, sitting between About's pink and the home periwinkle. */
+    :root {
+      --accent:      #c88bf0;
+      --accent-rgb:  200, 139, 240;
+      --accent-deep: #a763d6;
+    }
+
+    html, body { min-height: 100%; background: var(--home-bg); }
+    body { font-family: var(--mono); color: var(--home-text); -webkit-font-smoothing: antialiased; }
+
+    .page {
+      position: relative; z-index: 5; min-height: 100vh;
+      padding: 150px 22px 96px;
+      opacity: 0; transform: translateY(16px);
+      transition: opacity .8s ease, transform .8s cubic-bezier(.16,1,.3,1);
+    }
+    .page.in { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) { .page { transition: none; transform: none; } }
+
+    .head { width: min(780px, 94vw); margin: 0 auto 52px; }
+    .eyebrow {
+      font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 12px;
+    }
+    .head h1 {
+      font-family: var(--hand); font-weight: 400; color: #fff;
+      font-size: clamp(40px, 8vw, 56px); line-height: .95; margin-bottom: 18px;
+    }
+    .head p { font-size: 14.5px; line-height: 1.75; color: rgba(255,255,255,.74); max-width: 62ch; }
+
+    /* ===== project cards ===== */
+    /* Numbered like the About page tracklist: same decimal-leading-zero motif. */
+    .projects { width: min(780px, 94vw); margin: 0 auto; counter-reset: p; display: grid; gap: 20px; }
+
+    .proj {
+      counter-increment: p;
+      position: relative; overflow: hidden;
+      background: rgba(255,255,255,.035);
+      border: 1px solid rgba(255,255,255,.11);
+      border-radius: 15px; padding: 26px 28px 26px 30px;
+      transition: border-color .3s ease, background .3s ease, transform .3s cubic-bezier(.16,1,.3,1);
+    }
+    .proj::before {
+      content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+      background: var(--accent); opacity: 0;
+      transition: opacity .3s ease;
+    }
+    .proj:hover {
+      background: rgba(255,255,255,.055);
+      border-color: rgba(200,139,240,.42);
+      transform: translateY(-2px);
+    }
+    .proj:hover::before { opacity: .85; }
+    @media (prefers-reduced-motion: reduce) { .proj, .proj::before { transition: none; } }
+
+    .p-num {
+      display: block; font-size: 11px; letter-spacing: .12em;
+      color: var(--accent); margin-bottom: 9px;
+    }
+    .p-num::before { content: counter(p, decimal-leading-zero); }
+
+    .p-top {
+      display: flex; align-items: baseline; justify-content: space-between;
+      flex-wrap: wrap; gap: 6px 18px; margin-bottom: 14px;
+    }
+    .p-title {
+      font-size: clamp(18px, 2.6vw, 22px); font-weight: 600; color: #fff;
+      letter-spacing: -.01em; line-height: 1.25;
+    }
+    .p-dates { font-size: 11.5px; letter-spacing: .04em; color: rgba(255,255,255,.42); }
+
+    .stack { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+    .stack span {
+      font-size: 11.5px; color: rgba(255,255,255,.72);
+      background: rgba(200,139,240,.11);
+      border: 1px solid rgba(200,139,240,.26);
+      border-radius: 6px; padding: 3px 9px;
+    }
+
+    .proj ul { list-style: none; display: grid; gap: 10px; }
+    .proj li {
+      position: relative; padding-left: 18px;
+      font-size: 13.5px; line-height: 1.7; color: rgba(255,255,255,.78);
+    }
+    .proj li::before {
+      content: ""; position: absolute; left: 0; top: .66em;
+      width: 5px; height: 5px; border-radius: 50%; background: var(--accent); opacity: .7;
+    }
+
+    .cta { width: min(780px, 94vw); margin: 40px auto 0; display: flex; flex-wrap: wrap; gap: 12px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 9px;
+      font-size: 13.5px; letter-spacing: .02em; text-decoration: none;
+      border-radius: 10px; padding: 11px 18px;
+      transition: background .18s ease, border-color .18s ease, color .18s ease, transform .14s ease;
+    }
+    .btn.primary { color: #17111d; background: var(--accent); border: 1px solid var(--accent); }
+    .btn.primary:hover { background: #d5a2f5; transform: translateY(-1px); }
+    .btn.ghost { color: rgba(255,255,255,.85); background: transparent; border: 1px solid rgba(255,255,255,.22); }
+    .btn.ghost:hover { color: #fff; border-color: rgba(255,255,255,.45); transform: translateY(-1px); }
+    .btn .arrow { transition: transform .2s ease; }
+    .btn:hover .arrow { transform: translateX(3px); }
+
+    @media (max-width: 560px) {
+      .page { padding: 132px 16px 88px; }
+      .proj { padding: 22px 20px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <a class="skip-link" href="#main">Skip to content</a>
+  <canvas id="stars" aria-hidden="true"></canvas>
+
+  <a class="site-mark" href="index.html" aria-label="Mahika Raj, home"><span class="mk-full">Mahika Raj</span><span class="mk-short">MR</span></a>
+  <nav class="site-nav" aria-label="Primary">
+    <a href="about.html">About</a>
+    <a href="research.html">Research</a>
+    <a href="projects.html" class="active" aria-current="page">Projects</a>
+    <a href="games.html">Games</a>
+    <a href="contact.html">Contact me</a>
+  </nav>
+
+  <main class="page" id="main">
+    <header class="head">
+      <p class="eyebrow">// things I built</p>
+      <h1>Projects</h1>
+      <p>
+        A few things I&rsquo;ve built outside the labs.
+      </p>
+    </header>
+
+    <div class="projects">
+
+      <article class="proj">
+        <span class="p-num" aria-hidden="true"></span>
+        <div class="p-top">
+          <h2 class="p-title">Vision-Language UAV Navigation</h2>
+          <span class="p-dates">Jan 2026 &ndash; May 2026</span>
+        </div>
+        <div class="stack">
+          <span>Python</span><span>PyTorch</span><span>Deep Learning</span>
+          <span>Reinforcement Learning</span><span>Git</span>
+        </div>
+        <ul>
+          <li>Developed a fuel-aware UAV vision-language navigation pipeline using Teacher Forcing and DAgger on AerialVLN.</li>
+          <li>Evaluated across seen and unseen environments to strengthen robustness and generalization.</li>
+        </ul>
+      </article>
+
+      <article class="proj">
+        <span class="p-num" aria-hidden="true"></span>
+        <div class="p-top">
+          <h2 class="p-title">Agentic AI System</h2>
+          <span class="p-dates">Feb 2026 &ndash; Present</span>
+        </div>
+        <div class="stack">
+          <span>Python</span><span>LLMs</span><span>RAG</span><span>Tool-Calling</span>
+          <span>Eval &amp; Experimentation</span><span>APIs</span><span>Git</span>
+        </div>
+        <ul>
+          <li>Built a multi-agent LLM system with tool-calling to support multi-step reasoning and user-facing AI workflows.</li>
+          <li>Developed a RAG pipeline with optimized chunking and hybrid search, improving retrieval by 20%.</li>
+        </ul>
+      </article>
+
+      <article class="proj">
+        <span class="p-num" aria-hidden="true"></span>
+        <div class="p-top">
+          <h2 class="p-title">VeriStack</h2>
+          <span class="p-dates">Dec 2025 &ndash; Present</span>
+        </div>
+        <div class="stack">
+          <span>FastAPI</span><span>Next.js</span><span>PostgreSQL</span>
+          <span>Redis</span><span>Celery</span><span>scikit-learn</span>
+        </div>
+        <ul>
+          <li>Built backend ML services with FastAPI for real-time inference and low-latency online feature retrieval.</li>
+          <li>Designed a versioned feature registry with reusable SQL features and reproducible offline/online materialization.</li>
+        </ul>
+      </article>
+
+    </div>
+
+    <div class="cta">
+      <a class="btn primary" href="research.html">Research work <span class="arrow">&rarr;</span></a>
+      <a class="btn ghost" href="contact.html">Get in touch <span class="arrow">&rarr;</span></a>
+    </div>
+  </main>
+
+  <footer class="site-footer">© 2026 Mahika Raj</footer>
+
+  <script src="assets/cursor.js"></script>
+  <script src="assets/stars.js"></script>
+  <script src="assets/nav.js"></script>
+  <script>
+    window.addEventListener('load', function () {
+      requestAnimationFrame(function () {
+        document.querySelector('.page').classList.add('in');
+      });
+    });
+  </script>
+</body>
+</html>

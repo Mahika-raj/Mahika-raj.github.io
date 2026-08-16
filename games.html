@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Games | Mahika Raj</title>
+  <meta name="description" content="Stargazer, a constellation memory game. The sky traces a real constellation across a field of stars; trace it back from memory." />
+  <link rel="canonical" href="https://mahikaraj.com/games.html" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Mahika Raj" />
+  <meta property="og:title" content="Games | Mahika Raj" />
+  <meta property="og:description" content="Stargazer, a constellation memory game. The sky traces a real constellation; trace it back from memory." />
+  <meta property="og:url" content="https://mahikaraj.com/games.html" />
+  <meta property="og:image" content="https://mahikaraj.com/assets/og-card.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="alternate icon" href="assets/favicon.ico" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Butterfly+Kids&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/site.css" />
+
+  <style>
+    /* Games runs gold, the playful end of the spectrum. */
+    :root {
+      --accent:      #ffd166;
+      --accent-rgb:  255, 209, 102;
+      --accent-deep: #e0ae3c;
+      --wrong:       #ff6b6b;
+    }
+
+    html, body { min-height: 100%; background: var(--home-bg); }
+    body { font-family: var(--mono); color: var(--home-text); -webkit-font-smoothing: antialiased; }
+
+    .page {
+      position: relative; z-index: 5; min-height: 100vh;
+      padding: 148px 22px 92px;
+      opacity: 0; transform: translateY(16px);
+      transition: opacity .8s ease, transform .8s cubic-bezier(.16,1,.3,1);
+    }
+    .page.in { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) { .page { transition: none; transform: none; } }
+
+    .head { width: min(720px, 94vw); margin: 0 auto 34px; }
+    .eyebrow {
+      font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 12px;
+    }
+    .head h1 {
+      font-family: var(--hand); font-weight: 400; color: #fff;
+      font-size: clamp(40px, 8vw, 56px); line-height: .95; margin-bottom: 16px;
+    }
+    .head p { font-size: 14.5px; line-height: 1.75; color: rgba(255,255,255,.74); max-width: 58ch; }
+
+    /* ===== the game ===== */
+    /* Only one game for now. .games is already a grid, so a second cabinet
+       drops in beside this one without touching the layout. */
+    .games { width: min(720px, 94vw); margin: 0 auto; display: grid; gap: 24px; }
+
+    .cabinet {
+      background: rgba(255,255,255,.035);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 18px; overflow: hidden;
+    }
+    .cab-bar {
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+      padding: 13px 18px; background: rgba(255,255,255,.045);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .cab-name { font-size: 12.5px; letter-spacing: .06em; color: rgba(255,255,255,.9); font-weight: 600; }
+    .cab-tag { font-size: 11px; letter-spacing: .04em; color: rgba(255,255,255,.4); }
+    .scores { margin-left: auto; display: flex; gap: 16px; font-size: 11.5px; letter-spacing: .04em; }
+    .scores b { color: var(--accent); font-weight: 600; }
+    .scores span { color: rgba(255,255,255,.45); }
+
+    /* sky */
+    .sky {
+      position: relative; width: 100%; aspect-ratio: 16 / 11;
+      background:
+        radial-gradient(ellipse at 30% 20%, rgba(255,209,102,.05), transparent 60%),
+        #090909;
+      touch-action: manipulation;
+    }
+    @media (max-width: 620px) { .sky { aspect-ratio: 1 / 1; } }
+
+    .sky svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+    .sky svg line {
+      stroke: var(--accent); stroke-width: 1.6; stroke-linecap: round;
+      vector-effect: non-scaling-stroke; opacity: .85;
+    }
+    .sky svg line.ghost { stroke: rgba(255,255,255,.3); }
+
+    .star {
+      position: absolute; width: 30px; height: 30px; padding: 0;
+      transform: translate(-50%, -50%);
+      background: none; border: none; border-radius: 50%;
+      display: grid; place-items: center;
+    }
+    .star::after {
+      content: ""; width: 7px; height: 7px; border-radius: 50%;
+      background: rgba(255,255,255,.5);
+      box-shadow: 0 0 0 0 rgba(255,209,102,0);
+      transition: background .2s ease, width .2s ease, height .2s ease, box-shadow .3s ease;
+    }
+    .star:hover::after { background: rgba(255,255,255,.9); }
+    .star.on::after {
+      background: var(--accent); width: 12px; height: 12px;
+      box-shadow: 0 0 0 7px rgba(255,209,102,.18);
+    }
+    .star.bad::after {
+      background: var(--wrong); width: 12px; height: 12px;
+      box-shadow: 0 0 0 7px rgba(255,107,107,.2);
+    }
+    .sky.locked .star { pointer-events: none; }
+    @media (prefers-reduced-motion: reduce) { .star::after { transition: none; } }
+
+    /* status bar under the sky */
+    .cab-foot {
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+      padding: 15px 18px; border-top: 1px solid rgba(255,255,255,.08);
+      min-height: 62px;
+    }
+    .status { font-size: 13px; line-height: 1.5; color: rgba(255,255,255,.78); flex: 1; min-width: 200px; }
+    .status b { color: var(--accent); font-weight: 600; }
+    .status .win { color: var(--accent); }
+    .status .lose { color: var(--wrong); }
+
+    .play {
+      font-family: var(--mono); font-size: 13px; letter-spacing: .02em; font-weight: 600;
+      color: #17130a; background: var(--accent); border: none; border-radius: 9px;
+      padding: 10px 20px;
+      transition: background .18s ease, transform .14s ease;
+    }
+    .play:hover { background: #ffdc8a; transform: translateY(-1px); }
+    .play:active { transform: none; }
+
+    .how {
+      width: min(720px, 94vw); margin: 26px auto 0;
+      font-size: 12.5px; line-height: 1.8; color: rgba(255,255,255,.5);
+      border-top: 1px solid rgba(255,255,255,.09); padding-top: 20px;
+    }
+    .how b { color: rgba(255,255,255,.78); font-weight: 600; }
+    .how kbd {
+      font-family: var(--mono); font-size: 11px;
+      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16);
+      border-radius: 4px; padding: 1px 6px; color: rgba(255,255,255,.8);
+    }
+
+    @media (max-width: 560px) {
+      .page { padding: 132px 16px 88px; }
+      .scores { margin-left: 0; width: 100%; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <a class="skip-link" href="#main">Skip to content</a>
+  <canvas id="stars" aria-hidden="true"></canvas>
+
+  <a class="site-mark" href="index.html" aria-label="Mahika Raj, home"><span class="mk-full">Mahika Raj</span><span class="mk-short">MR</span></a>
+  <nav class="site-nav" aria-label="Primary">
+    <a href="about.html">About</a>
+    <a href="research.html">Research</a>
+    <a href="projects.html">Projects</a>
+    <a href="games.html" class="active" aria-current="page">Games</a>
+    <a href="contact.html">Contact me</a>
+  </nav>
+
+  <main class="page" id="main">
+    <header class="head">
+      <p class="eyebrow">// 88 of them, and counting</p>
+      <h1>Games</h1>
+      <p>
+        The constellations on every other page finally have something to do.
+      </p>
+    </header>
+
+    <div class="games">
+      <section class="cabinet">
+        <div class="cab-bar">
+          <span class="cab-name">Stargazer</span>
+          <span class="cab-tag">constellation memory</span>
+          <span class="scores">
+            <span>round <b id="scoreRound">0</b></span>
+            <span>best <b id="scoreBest">0</b></span>
+          </span>
+        </div>
+
+        <div class="sky locked" id="sky">
+          <svg id="lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
+        </div>
+
+        <div class="cab-foot">
+          <p class="status" id="status" role="status" aria-live="polite">
+            The sky traces a real constellation. Trace it back from memory.
+          </p>
+          <button class="play" id="play" type="button">Start</button>
+        </div>
+      </section>
+    </div>
+
+    <p class="how">
+      <b>How to play.</b> Watch the sky connect a constellation, then click its stars back in
+      the same order. One wrong star ends the run. Keyboard works too:
+      <kbd>Tab</kbd> between stars, <kbd>Enter</kbd> to pick one.
+    </p>
+  </main>
+
+  <footer class="site-footer">© 2026 Mahika Raj</footer>
+
+  <script src="assets/cursor.js"></script>
+  <script src="assets/stars.js"></script>
+  <script src="assets/nav.js"></script>
+
+  <script>
+  /* ==========================================================================
+     Stargazer.
+
+     Real constellations, in roughly ascending star count. Coordinates are
+     normalised 0-1 within the sky box and traced as a single polyline, which
+     is why the shapes here are the ones astronomers actually draw as a line
+     (Cassiopeia's W, the Plough) rather than the branching ones like Cygnus.
+
+     The stars are real <button> elements rather than canvas hit-testing, so
+     Tab, Enter, and focus rings all work for free. Only the connecting lines
+     are drawn (as SVG) underneath.
+     ====================================================================== */
+  (function () {
+    var SHAPES = [
+      { name: 'Corvus',      sub: 'the crow',    stars: [[.18,.64],[.30,.24],[.72,.30],[.66,.76]] },
+      { name: 'Cassiopeia',  sub: 'the queen',   stars: [[.07,.36],[.28,.72],[.50,.30],[.72,.74],[.93,.28]] },
+      { name: 'Lyra',        sub: 'the lyre',    stars: [[.46,.10],[.33,.37],[.40,.73],[.68,.75],[.63,.39]] },
+      { name: 'Cepheus',     sub: 'the king',    stars: [[.27,.74],[.27,.37],[.52,.11],[.77,.35],[.72,.73]] },
+      { name: 'Delphinus',   sub: 'the dolphin', stars: [[.22,.79],[.42,.53],[.39,.26],[.63,.20],[.67,.47]] },
+      { name: 'Ursa Major',  sub: 'the plough',  stars: [[.06,.30],[.22,.39],[.37,.46],[.52,.51],[.58,.73],[.81,.75],[.83,.47]] }
+    ];
+
+    var sky      = document.getElementById('sky');
+    var linesSvg = document.getElementById('lines');
+    var statusEl = document.getElementById('status');
+    var playBtn  = document.getElementById('play');
+    var roundEl  = document.getElementById('scoreRound');
+    var bestEl   = document.getElementById('scoreBest');
+    if (!sky) return;
+
+    var SVG_NS = 'http://www.w3.org/2000/svg';
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var STEP = reduce ? 320 : 540;   // pace of the demo trace
+
+    var round = 0, seq = [], progress = 0, points = [], buttons = [], timers = [];
+    var best = 0;
+    try { best = parseInt(localStorage.getItem('stargazer.best') || '0', 10) || 0; } catch (e) {}
+    bestEl.textContent = best;
+
+    function clearTimers() {
+      timers.forEach(clearTimeout);
+      timers = [];
+    }
+    function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+
+    function clearLines() {
+      while (linesSvg.firstChild) linesSvg.removeChild(linesSvg.firstChild);
+    }
+
+    function drawLine(a, b, ghost) {
+      var ln = document.createElementNS(SVG_NS, 'line');
+      ln.setAttribute('x1', (points[a][0] * 100).toFixed(2));
+      ln.setAttribute('y1', (points[a][1] * 100).toFixed(2));
+      ln.setAttribute('x2', (points[b][0] * 100).toFixed(2));
+      ln.setAttribute('y2', (points[b][1] * 100).toFixed(2));
+      if (ghost) ln.setAttribute('class', 'ghost');
+      linesSvg.appendChild(ln);
+    }
+
+    /* Decoys are rejection-sampled so they never crowd a real star (or each
+       other) closely enough to make the puzzle a coin-flip. */
+    function buildField(shape, decoyCount) {
+      var pts = shape.stars.map(function (s) { return [s[0], s[1]]; });
+      var MIN = 0.11, guard = 0;
+      while (pts.length < shape.stars.length + decoyCount && guard++ < 4000) {
+        var c = [0.06 + Math.random() * 0.88, 0.08 + Math.random() * 0.84];
+        var ok = pts.every(function (p) { return Math.hypot(p[0] - c[0], p[1] - c[1]) > MIN; });
+        if (ok) pts.push(c);
+      }
+      return pts;
+    }
+
+    /* Every star looks identical. The decoys are only decoys because they
+       weren't in the trace. Marking them would give the puzzle away. */
+    function render() {
+      buttons.forEach(function (b) { b.remove(); });
+      buttons = [];
+      points.forEach(function (p, i) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'star';
+        b.style.left = (p[0] * 100) + '%';
+        b.style.top  = (p[1] * 100) + '%';
+        b.setAttribute('aria-label', 'Star ' + (i + 1) + ' of ' + points.length);
+        b.addEventListener('click', function () { pick(i); });
+        sky.appendChild(b);
+        buttons.push(b);
+      });
+    }
+
+    function lit(on) {
+      buttons.forEach(function (b) { b.classList.remove('on', 'bad'); });
+      (on || []).forEach(function (i) { buttons[i].classList.add('on'); });
+    }
+
+    function nextRound() {
+      clearTimers();
+      var shape = SHAPES[round % SHAPES.length];
+      var decoys = Math.min(4 + round * 2, 15);
+
+      points = buildField(shape, decoys);
+      seq = shape.stars.map(function (_, i) { return i; });   // real stars are indices 0..n-1
+      progress = 0;
+
+      render();
+      clearLines();
+      lit([]);
+      sky.classList.add('locked');
+
+      roundEl.textContent = round + 1;
+      statusEl.innerHTML = 'Round <b>' + (round + 1) + '</b>. Watch the sky&hellip;';
+
+      // Trace the constellation, one star at a time.
+      seq.forEach(function (idx, k) {
+        later(function () {
+          buttons[idx].classList.add('on');
+          if (k > 0) drawLine(seq[k - 1], idx);
+        }, 620 + k * STEP);
+      });
+
+      // Then wipe it and hand over.
+      later(function () {
+        clearLines();
+        lit([]);
+        sky.classList.remove('locked');
+        statusEl.innerHTML = 'Your turn. Trace it back: <b>' + seq.length + '</b> stars.';
+        var first = buttons[0];
+        if (first) first.focus({ preventScroll: true });
+      }, 620 + seq.length * STEP + 640);
+    }
+
+    function pick(i) {
+      if (sky.classList.contains('locked')) return;
+
+      if (i !== seq[progress]) {
+        buttons[i].classList.add('bad');
+        sky.classList.add('locked');
+        var shape = SHAPES[round % SHAPES.length];
+        statusEl.innerHTML =
+          '<span class="lose">Not that one.</span> That was <b>' + shape.name +
+          '</b>, ' + shape.sub + '. You cleared <b>' + round + '</b> ' +
+          (round === 1 ? 'round' : 'rounds') + '.';
+        // show the answer
+        seq.forEach(function (idx, k) { if (k > 0) drawLine(seq[k - 1], idx, true); });
+        lit(seq);
+        buttons[i].classList.remove('on');
+        buttons[i].classList.add('bad');
+        playBtn.textContent = 'Play again';
+        playBtn.hidden = false;
+        return;
+      }
+
+      buttons[i].classList.add('on');
+      if (progress > 0) drawLine(seq[progress - 1], i);
+      progress++;
+
+      if (progress === seq.length) {
+        sky.classList.add('locked');
+        round++;
+        if (round > best) {
+          best = round;
+          bestEl.textContent = best;
+          try { localStorage.setItem('stargazer.best', String(best)); } catch (e) {}
+        }
+        var shape = SHAPES[(round - 1) % SHAPES.length];
+        statusEl.innerHTML =
+          '<span class="win">&#10003; ' + shape.name + '</span>, ' + shape.sub + '.';
+        later(nextRound, 1500);
+      }
+    }
+
+    playBtn.addEventListener('click', function () {
+      round = 0;
+      playBtn.hidden = true;
+      nextRound();
+    });
+
+    /* Idle sky: a real constellation, faintly drawn, so the cabinet reads as a
+       night sky rather than an empty box before anyone presses Start. */
+    (function idle() {
+      var shape = SHAPES[1];                       // Cassiopeia's W
+      points = buildField(shape, 9);
+      render();
+      sky.classList.add('locked');
+      shape.stars.forEach(function (_, k) {
+        if (k > 0) drawLine(k - 1, k, true);
+      });
+    })();
+  })();
+
+  window.addEventListener('load', function () {
+    requestAnimationFrame(function () {
+      document.querySelector('.page').classList.add('in');
+    });
+  });
+  </script>
+</body>
+</html>

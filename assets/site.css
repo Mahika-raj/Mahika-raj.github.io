@@ -1,0 +1,163 @@
+/* ============================================================================
+   mahikaraj.com: shared chrome.
+
+   Everything identical across pages lives here: design tokens, the top nav and
+   wordmark, the footer, the constellation canvas, the custom cursor, and focus
+   styles. Each page keeps its own bespoke design (the turntable, the macOS
+   window, the code-rain intro) in its own <style> block, loaded AFTER this
+   file so page rules win wherever they overlap.
+
+   Accent: every page sets its own hue on :root. --accent-rgb is the same
+   colour as bare "r,g,b" numbers, because assets/stars.js reads it to tint the
+   constellation lines. Set both or the canvas falls back to periwinkle.
+   ========================================================================= */
+
+:root {
+  --bg:         #ffffff;
+  --ink:        #111111;
+  --home-bg:    #0e0e0e;
+  --home-text:  #ffffff;
+
+  --hand: "Butterfly Kids", cursive;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --soft-ease: cubic-bezier(.25, .8, .25, 1);
+
+  /* default accent: periwinkle (the home page hue) */
+  --accent:      #b0a8e6;
+  --accent-rgb:  176, 168, 230;
+  --accent-deep: #8f85d6;
+
+  /* light "window" surfaces, used by the macOS-style panels */
+  --mac-bar:  #f1f1f3;
+  --mac-line: #e3e3e8;
+  --field:    #f6f6f8;
+  --field-bd: #e3e3e8;
+  --mut:      #6b6b76;
+  --faint:    #9a9aa6;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ===== constellation canvas ===== */
+/* Fixed so it covers the page through scroll. index.html re-positions this to
+   absolute inside its reveal wrapper; that override lives in index.html. */
+#stars {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  opacity: 0; transition: opacity 1300ms ease;
+}
+#stars.lit { opacity: 1; }
+
+/* ===== custom pixel cursor ===== */
+/* Scoped to .has-custom-cursor, which assets/cursor.js sets only once it has
+   actually drawn a cursor. Without that guard a script failure leaves the
+   visitor with no pointer at all. */
+.has-custom-cursor * { cursor: none !important; }
+#sweezyAniCursor {
+  position: fixed; left: 0; top: 0; width: 32px; height: 32px;
+  pointer-events: none; z-index: 2147483647;
+  background-repeat: no-repeat; background-position: 0 0; background-size: 32px 32px;
+  transform: translate3d(-100px, -100px, 0); will-change: transform, background-image;
+}
+@media (pointer: coarse) {
+  #sweezyAniCursor { display: none !important; }
+}
+
+/* ===== skip link ===== */
+.skip-link {
+  position: fixed; top: 8px; left: 50%; z-index: 100;
+  transform: translate(-50%, -160%);
+  font-family: var(--mono); font-size: 12.5px; letter-spacing: .04em;
+  color: #111; background: #fff; border-radius: 8px;
+  padding: 9px 16px; text-decoration: none;
+  transition: transform .25s var(--soft-ease);
+}
+.skip-link:focus { transform: translate(-50%, 0); }
+
+/* ===== top navigation ===== */
+.site-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 40;
+  display: flex; justify-content: center; flex-wrap: wrap;
+  gap: clamp(13px, 3vw, 34px); padding: clamp(16px, 3vw, 26px) 24px;
+  opacity: 0; transform: translateY(-130%);
+  transition: opacity .55s ease, transform .75s cubic-bezier(.16, 1, .3, 1);
+  pointer-events: none;
+}
+.site-nav.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.site-nav a {
+  font-family: var(--mono); font-size: clamp(12.5px, 1.4vw, 15px); letter-spacing: .04em;
+  color: rgba(255, 255, 255, .8); text-decoration: none; position: relative; padding: 4px 2px;
+  opacity: 0; transform: translateY(-7px);
+  transition: opacity .5s ease, transform .55s cubic-bezier(.16, 1, .3, 1), color .25s ease;
+}
+.site-nav.show a { opacity: 1; transform: none; }
+.site-nav.show a:nth-child(1) { transition-delay: .10s; }
+.site-nav.show a:nth-child(2) { transition-delay: .17s; }
+.site-nav.show a:nth-child(3) { transition-delay: .24s; }
+.site-nav.show a:nth-child(4) { transition-delay: .31s; }
+.site-nav.show a:nth-child(5) { transition-delay: .38s; }
+.site-nav.show a:nth-child(6) { transition-delay: .45s; }
+.site-nav a:hover { color: #fff; }
+.site-nav a::after {
+  content: ""; position: absolute; left: 2px; right: 2px; bottom: 0; height: 1.5px;
+  background: currentColor; transform: scaleX(0); transform-origin: left center;
+  transition: transform .3s ease;
+}
+.site-nav a:hover::after { transform: scaleX(1); }
+.site-nav a.active { color: #fff; }
+.site-nav a.active::after { transform: scaleX(1); background: rgba(255, 255, 255, .85); }
+
+/* ===== wordmark ===== */
+.site-mark {
+  position: fixed; top: 0; left: 0; z-index: 41;
+  padding: clamp(10px, 2.2vw, 18px) 26px;
+  font-family: var(--hand); font-size: clamp(25px, 3.2vw, 30px); font-weight: 400;
+  letter-spacing: 0; color: rgba(255, 255, 255, .92); text-decoration: none;
+  opacity: 0; transform: translateY(-130%);
+  transition: opacity .55s ease, transform .75s cubic-bezier(.16, 1, .3, 1), color .25s ease;
+}
+.site-mark.show { opacity: 1; transform: translateY(0); }
+.site-mark:hover { color: #fff; }
+.site-mark .mk-short { display: none; }
+@media (max-width: 760px) {
+  .site-mark .mk-full { display: none; }
+  .site-mark .mk-short { display: inline; }
+  /* The mark and the nav share the top row here. Reserve the mark's width on
+     the left so the first nav item can never land underneath "MR". */
+  .site-nav { padding-left: 74px; }
+}
+
+/* ===== footer ===== */
+.site-footer {
+  position: fixed; left: 0; right: 0; bottom: 16px; text-align: center; z-index: 35;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .05em;
+  color: rgba(255, 255, 255, .45); pointer-events: none;
+}
+
+/* ===== focus ===== */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-nav, .site-nav a, .site-mark { transition: none; transform: none; }
+  #stars { transition: none; }
+  /* Only the transition goes. The skip link's transform is what keeps it
+     off-screen until focused, so blanking it here would pin it over the nav. */
+  .skip-link { transition: none; }
+}
+
+/* The nav and wordmark animate in from JS (assets/nav.js). Without scripting
+   they would sit at opacity 0 forever, so hand them straight to the visitor. */
+@media (scripting: none) {
+  .site-nav { opacity: 1; transform: none; pointer-events: auto; }
+  .site-nav a { opacity: 1; transform: none; }
+  .site-mark { opacity: 1; transform: none; }
+  #stars { opacity: 1; }
+}
