@@ -137,29 +137,66 @@
 
 /* ===== chrome scrims =====
    The nav and footer are fixed and fully transparent, so page content used to
-   scroll straight through them. These live on <body> rather than inside .site-nav
-   on purpose: .site-nav has a transform, which creates a stacking context, and a
-   backdrop-filter inside it can only sample that context — i.e. nothing. On body
-   they sit in the root stacking context and can actually blur the page.
+   scroll straight through them. These fade the page out behind the chrome.
+
+   They live on <body>, not inside .site-nav: .site-nav is transformed, which
+   makes a stacking context, and anything painted inside it can only sit above
+   that context's own content — i.e. nothing.
+
+   The stop list is a smoothstep curve (3t^2 - 2t^3), not evenly spaced. A plain
+   two-stop gradient has a constant slope that stops dead at the end, and the eye
+   reads that discontinuity as a faint horizontal line. Smoothstep is flat at both
+   ends, so the scrim has no edge anywhere — it just stops existing.
+
+   Colour is the page background (#0e0e0e), so over the dark field it is
+   invisible and only the light cards actually darken.
    z-index 30 keeps them above .page (5) and below the footer (35) and nav (40). */
 body::before,
 body::after {
   content: ""; position: fixed; left: 0; right: 0; z-index: 30;
   pointer-events: none;
-  background: rgba(14, 14, 14, .45);
-  -webkit-backdrop-filter: blur(14px) saturate(112%);
-          backdrop-filter: blur(14px) saturate(112%);
 }
 body::before {
-  top: 0; height: 104px;
-  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 100%);
-          mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 100%);
+  top: 0; height: 200px;
+  background: linear-gradient(to bottom,
+    rgba(14, 14, 14, .90)   0%,
+    rgba(14, 14, 14, .90)  22%,
+    rgba(14, 14, 14, .874) 30%,
+    rgba(14, 14, 14, .802) 38%,
+    rgba(14, 14, 14, .697) 46%,
+    rgba(14, 14, 14, .570) 54%,
+    rgba(14, 14, 14, .433) 62%,
+    rgba(14, 14, 14, .297) 70%,
+    rgba(14, 14, 14, .175) 78%,
+    rgba(14, 14, 14, .077) 86%,
+    rgba(14, 14, 14, .015) 94%,
+    rgba(14, 14, 14, 0)   100%);
 }
 body::after {
-  bottom: 0; height: 76px;
-  -webkit-mask-image: linear-gradient(to top, #000 0%, #000 52%, transparent 100%);
-          mask-image: linear-gradient(to top, #000 0%, #000 52%, transparent 100%);
+  bottom: 0; height: 150px;
+  background: linear-gradient(to top,
+    rgba(14, 14, 14, .90)   0%,
+    rgba(14, 14, 14, .90)  22%,
+    rgba(14, 14, 14, .874) 30%,
+    rgba(14, 14, 14, .802) 38%,
+    rgba(14, 14, 14, .697) 46%,
+    rgba(14, 14, 14, .570) 54%,
+    rgba(14, 14, 14, .433) 62%,
+    rgba(14, 14, 14, .297) 70%,
+    rgba(14, 14, 14, .175) 78%,
+    rgba(14, 14, 14, .077) 86%,
+    rgba(14, 14, 14, .015) 94%,
+    rgba(14, 14, 14, 0)   100%);
 }
+
+/* The home page is the exception, and only at the bottom. Its loader is a
+   white full-screen panel at z-index 30 — the same layer as the scrims — and
+   ties on z-index break by DOM order, so body::after (generated after every
+   child) paints over the loader while body::before (generated before them all)
+   paints under it. That put a dark band across the bottom of a white loading
+   screen. Nothing needs covering there in any case: the footer sits on the
+   loader, then on flat #0e0e0e. .reveal-wrap exists only on index.html. */
+body:has(.reveal-wrap)::after { display: none; }
 
 /* ===== focus ===== */
 a:focus-visible,
