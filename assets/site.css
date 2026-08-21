@@ -148,6 +148,12 @@
    reads that discontinuity as a faint horizontal line. Smoothstep is flat at both
    ends, so the scrim has no edge anywhere — it just stops existing.
 
+   Heights are deliberately tight: the stops are percentages, so shrinking the
+   box compresses the whole curve rather than clipping its tail. The floor on
+   each is set by the text it has to keep legible — the nav's baseline sits at
+   ~48px and the footer's at ~27px, and both need to land before the curve has
+   fallen far. 150 / 90 keeps roughly .87 alpha at those two points.
+
    Colour is the page background (#0e0e0e), so over the dark field it is
    invisible and only the light cards actually darken.
    z-index 30 keeps them above .page (5) and below the footer (35) and nav (40). */
@@ -157,7 +163,7 @@ body::after {
   pointer-events: none;
 }
 body::before {
-  top: 0; height: 200px;
+  top: 0; height: 150px;
   background: linear-gradient(to bottom,
     rgba(14, 14, 14, .90)   0%,
     rgba(14, 14, 14, .90)  22%,
@@ -173,7 +179,7 @@ body::before {
     rgba(14, 14, 14, 0)   100%);
 }
 body::after {
-  bottom: 0; height: 150px;
+  bottom: 0; height: 90px;
   background: linear-gradient(to top,
     rgba(14, 14, 14, .90)   0%,
     rgba(14, 14, 14, .90)  22%,
@@ -221,7 +227,7 @@ textarea:focus-visible,
    they would sit at opacity 0 forever, so hand them straight to the visitor. */
 @media (scripting: none) {
   .site-nav { opacity: 1; transform: none; pointer-events: auto; }
-  .site-nav a { opacity: 1; transform: none; }
   .site-mark { opacity: 1; transform: none; }
+  .site-nav a { opacity: 1; transform: none; }
   #stars { opacity: 1; }
 }
