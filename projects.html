@@ -252,6 +252,26 @@
       <article class="proj">
         <span class="p-num" aria-hidden="true"></span>
         <div class="p-top">
+          <h2 class="p-title">VeriStack</h2>
+          <span class="p-dates">Dec 2025 &ndash; Present</span>
+        </div>
+        <div class="stack">
+          <span>FastAPI</span><span>Next.js</span><span>PostgreSQL</span>
+          <span>SQLAlchemy</span><span>Alembic</span><span>scikit-learn</span>
+        </div>
+        <ul>
+          <li>A feature store aimed at <strong>training-serving skew</strong> &mdash; the failure where a model sees one definition of a feature in training and a subtly different one in production, and quietly degrades.</li>
+          <li>The design: define each feature once as a versioned SQL template, freeze a feature-set version, backfill it offline to build training matrices, materialize the latest values online for inference, then run consistency checks that report per-feature mismatch rates between the two stores.</li>
+          <li>FastAPI service over a Postgres schema managed with Alembic migrations, with a Next.js frontend wired to the API.</li>
+        </ul>
+        <a class="p-link" href="https://github.com/Mahika-raj/VeriStack" target="_blank" rel="noopener">
+          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg> github.com/Mahika-raj/VeriStack <span class="arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </article>
+
+      <article class="proj">
+        <span class="p-num" aria-hidden="true"></span>
+        <div class="p-top">
           <h2 class="p-title">Agentic Research Assistant<span class="wip">in progress</span></h2>
           <span class="p-dates">Feb 2026 &ndash; Present</span>
         </div>
@@ -267,26 +287,6 @@
         </ul>
         <a class="p-link" href="https://github.com/Mahika-raj/Agentic-Research-Assistant" target="_blank" rel="noopener">
           <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg> github.com/Mahika-raj/Agentic-Research-Assistant <span class="arrow" aria-hidden="true">&rarr;</span>
-        </a>
-      </article>
-
-      <article class="proj">
-        <span class="p-num" aria-hidden="true"></span>
-        <div class="p-top">
-          <h2 class="p-title">VeriStack<span class="wip">building</span></h2>
-          <span class="p-dates">Dec 2025 &ndash; Present</span>
-        </div>
-        <div class="stack">
-          <span>FastAPI</span><span>Next.js</span><span>PostgreSQL</span>
-          <span>SQLAlchemy</span><span>Alembic</span><span>scikit-learn</span>
-        </div>
-        <ul>
-          <li>A feature store aimed at <strong>training-serving skew</strong> &mdash; the failure where a model sees one definition of a feature in training and a subtly different one in production, and quietly degrades.</li>
-          <li>The design: define each feature once as a versioned SQL template, freeze a feature-set version, backfill it offline to build training matrices, materialize the latest values online for inference, then run consistency checks that report per-feature mismatch rates between the two stores.</li>
-          <li>Scaffolded so far &mdash; FastAPI service, Postgres schema under Alembic migrations, and a Next.js frontend wired to the API. The registry, materialization jobs and consistency checks are what I am building next.</li>
-        </ul>
-        <a class="p-link" href="https://github.com/Mahika-raj/VeriStack" target="_blank" rel="noopener">
-          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg> github.com/Mahika-raj/VeriStack <span class="arrow" aria-hidden="true">&rarr;</span>
         </a>
       </article>
 
