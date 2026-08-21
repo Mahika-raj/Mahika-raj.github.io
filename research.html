@@ -272,10 +272,11 @@
           <span class="c-dates">Apr 2023 &ndash; Aug 2023</span>
         </div>
         <h2 class="c-org"><a href="https://www.lumiere-education.com/" target="_blank" rel="noopener">Lumiere Education</a><svg class="ext" aria-hidden="true" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.4 8.6 8.6 3.4M4.6 3.4h4v4" /></svg></h2>
-        <p class="c-where">Cambridge, MA &middot; dimensionality reduction</p>
+        <p class="c-where">Cambridge, MA &middot; dimensionality reduction, mentored by a Yale PhD student</p>
         <ul>
-          <li>Co-authored research with a Yale PhD student on <strong>PCA-based dimensionality reduction</strong>, implementing and evaluating multiple PCA variants in <strong>Python</strong> on high-dimensional datasets.</li>
-          <li>Explored the trade-offs between runtime, explained variance and reconstruction error to compare how the variants actually behave on real data rather than in the asymptotic case.</li>
+          <li>Authored a paper benchmarking four <strong>PCA</strong> variants in <strong>Python</strong> &mdash; Standard (exact SVD), <strong>Randomised</strong> (approximate SVD), <strong>Kernel</strong> and <strong>Incremental</strong> &mdash; on UCI gene-expression RNA-Seq (800 &times; 16,000) and Isolet (7,800 &times; 620), picked so one matrix is far wider than tall and the other the reverse, measuring runtime and reconstruction error against component count over 25&ndash;100 iterations.</li>
+          <li>The result contradicted the hypothesis: <strong>Randomised PCA bought no speed over Standard PCA</strong> and matched its reconstruction error to two decimal places, with Standard pulling <em>ahead</em> past ~500 components. All randomisation added was runtime variance (&sigma; 0.57 against 0.30).</li>
+          <li><strong>Kernel PCA&rsquo;s error turned out flat in component count</strong> &mdash; the kernel matrix preserves pairwise similarities, so extra components buy back no detail &mdash; and its runtime is set by matrix shape, ~45s tall against ~1s wide. Incremental PCA&rsquo;s runtime is the flat one instead, overtaking Standard past ~400 components.</li>
         </ul>
       </article>
 
