@@ -128,18 +128,23 @@
   .site-nav { padding-left: 74px; }
 }
 
-/* ===== footer ===== */
+/* ===== footer =====
+   Deliberately bare. A scrim, a radial pool and a chip were all tried here and
+   all of them cost more visually than the line is worth; the copyright is
+   decorative, so where it crosses a light card it simply goes quiet. Do not
+   add a background back without a reason. */
 .site-footer {
   position: fixed; left: 0; right: 0; bottom: 16px; text-align: center; z-index: 35;
   font-family: var(--mono); font-size: 11px; letter-spacing: .05em;
   color: rgba(255, 255, 255, .45); pointer-events: none;
 }
 
-/* ===== chrome scrims =====
-   The nav and footer are fixed and fully transparent, so page content used to
-   scroll straight through them. These fade the page out behind the chrome.
+/* ===== chrome scrim =====
+   The nav is fixed and fully transparent, so page content used to scroll
+   straight through it. This fades the page out behind it. There is no matching
+   scrim at the bottom on purpose — see the footer note above.
 
-   They live on <body>, not inside .site-nav: .site-nav is transformed, which
+   It lives on <body>, not inside .site-nav: .site-nav is transformed, which
    makes a stacking context, and anything painted inside it can only sit above
    that context's own content — i.e. nothing.
 
@@ -148,21 +153,16 @@
    reads that discontinuity as a faint horizontal line. Smoothstep is flat at both
    ends, so the scrim has no edge anywhere — it just stops existing.
 
-   Heights are deliberately tight: the stops are percentages, so shrinking the
-   box compresses the whole curve rather than clipping its tail. The floor on
-   each is set by the text it has to keep legible — the nav's baseline sits at
-   ~48px and the footer's at ~27px, and both need to land before the curve has
-   fallen far. 150 / 90 keeps roughly .87 alpha at those two points.
+   The stops are percentages, so shrinking the box compresses the curve rather
+   than clipping its tail; 150px is the floor that still holds ~.87 alpha at the
+   nav's baseline (~48px), which is what keeps the links crisp.
 
    Colour is the page background (#0e0e0e), so over the dark field it is
    invisible and only the light cards actually darken.
-   z-index 30 keeps them above .page (5) and below the footer (35) and nav (40). */
-body::before,
-body::after {
+   z-index 30 keeps it above .page (5) and below the footer (35) and nav (40). */
+body::before {
   content: ""; position: fixed; left: 0; right: 0; z-index: 30;
   pointer-events: none;
-}
-body::before {
   top: 0; height: 150px;
   background: linear-gradient(to bottom,
     rgba(14, 14, 14, .90)   0%,
@@ -178,31 +178,13 @@ body::before {
     rgba(14, 14, 14, .015) 94%,
     rgba(14, 14, 14, 0)   100%);
 }
-body::after {
-  bottom: 0; height: 90px;
-  background: linear-gradient(to top,
-    rgba(14, 14, 14, .90)   0%,
-    rgba(14, 14, 14, .90)  22%,
-    rgba(14, 14, 14, .874) 30%,
-    rgba(14, 14, 14, .802) 38%,
-    rgba(14, 14, 14, .697) 46%,
-    rgba(14, 14, 14, .570) 54%,
-    rgba(14, 14, 14, .433) 62%,
-    rgba(14, 14, 14, .297) 70%,
-    rgba(14, 14, 14, .175) 78%,
-    rgba(14, 14, 14, .077) 86%,
-    rgba(14, 14, 14, .015) 94%,
-    rgba(14, 14, 14, 0)   100%);
-}
 
-/* The home page is the exception, and only at the bottom. Its loader is a
-   white full-screen panel at z-index 30 — the same layer as the scrims — and
-   ties on z-index break by DOM order, so body::after (generated after every
-   child) paints over the loader while body::before (generated before them all)
-   paints under it. That put a dark band across the bottom of a white loading
-   screen. Nothing needs covering there in any case: the footer sits on the
-   loader, then on flat #0e0e0e. .reveal-wrap exists only on index.html. */
-body:has(.reveal-wrap)::after { display: none; }
+/* On the home page the scrim waits for the intro. index.html adds .lit to
+   #stars at the 5.5s mark, the moment the code screen clears and the
+   constellation comes up, so keying off it lands the fade-in exactly there
+   rather than on a duplicated timer that would drift if the sequence changes. */
+body:has(.reveal-wrap)::before { opacity: 0; transition: opacity 1.1s ease; }
+body:has(.reveal-wrap #stars.lit)::before { opacity: 1; }
 
 /* ===== focus ===== */
 a:focus-visible,
@@ -218,6 +200,9 @@ textarea:focus-visible,
 @media (prefers-reduced-motion: reduce) {
   .site-nav, .site-nav a, .site-mark { transition: none; transform: none; }
   #stars { transition: none; }
+  /* The home intro is skipped entirely under reduced motion, so #stars never
+     gets .lit there. Hand the top scrim over rather than leaving it at 0. */
+  body:has(.reveal-wrap)::before { opacity: 1; transition: none; }
   /* Only the transition goes. The skip link's transform is what keeps it
      off-screen until focused, so blanking it here would pin it over the nav. */
   .skip-link { transition: none; }
