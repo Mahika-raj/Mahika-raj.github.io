@@ -4,13 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Research | Mahika Raj</title>
-  <meta name="description" content="Machine learning research by Mahika Raj: diffusion models for generative audio, multi-agent RAG and hallucination benchmarking, and movement-disorder modelling from gait motion capture." />
+  <meta name="description" content="Machine learning research by Mahika Raj: diffusion models for generative audio and PDE video, multi-agent RAG and hallucination benchmarking, movement-disorder modelling from gait motion capture, and PCA-based dimensionality reduction." />
   <link rel="canonical" href="https://mahikaraj.com/research.html" />
 
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Mahika Raj" />
   <meta property="og:title" content="Research | Mahika Raj" />
-  <meta property="og:description" content="Diffusion models for generative audio, multi-agent RAG and hallucination benchmarking, and movement-disorder modelling from gait motion capture." />
+  <meta property="og:description" content="Diffusion models for generative audio and PDE video, multi-agent RAG and hallucination benchmarking, and movement-disorder modelling from gait motion capture." />
   <meta property="og:url" content="https://mahikaraj.com/research.html" />
   <meta property="og:image" content="https://mahikaraj.com/assets/og-card.png" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -103,6 +103,23 @@
     }
     .c-where { font-size: 12px; color: var(--card-mut); margin-bottom: 18px; }
 
+    /* Lab links live inside the cream card, so they inherit the card's ink
+       instead of the site's white-on-dark link colour. The underline is a
+       border on the <a> itself; the arrow is a sibling, not a child, because a
+       border on an inline box would draw straight under the glyph too. */
+    .c-org a {
+      color: inherit; text-decoration: none;
+      border-bottom: 1.5px solid rgba(63,174,156,.5);
+      transition: color .18s ease, border-color .18s ease;
+    }
+    .c-org a:hover, .c-org a:focus-visible { color: var(--accent-deep); border-bottom-color: var(--accent-deep); }
+    .c-org .ext {
+      width: .48em; height: .48em; margin-left: .42em;
+      color: var(--accent-deep); opacity: .6; flex-shrink: 0;
+      transition: transform .2s ease, opacity .2s ease;
+    }
+    .c-org a:hover + .ext, .c-org a:focus-visible + .ext { opacity: 1; transform: translate(2px, -2px); }
+
     .card ul { list-style: none; display: grid; gap: 12px; }
     .card li {
       position: relative; padding-left: 19px;
@@ -115,8 +132,7 @@
     }
 
     /* Status chips carry the honest state of unpublished work. The wording
-       here is fixed: "in progress" and "toward authorship" are facts, not
-       placeholders to upgrade later. */
+       here is fixed: "in progress" is a fact, not a placeholder to upgrade. */
     .status {
       display: inline-flex; align-items: center; gap: 8px; margin-top: 18px;
       font-size: 11.5px; line-height: 1.45; letter-spacing: .02em;
@@ -192,10 +208,11 @@
       <p class="eyebrow">// field notes</p>
       <h1>Research</h1>
       <p>
-        I&rsquo;m in three labs right now, working on things that don&rsquo;t look related from the
-        outside: generative audio, a retrieval system for scientific papers, and gait data
-        from patients. What I keep coming back to is evaluation. Working out whether a model
-        is actually better, or just looks better, is usually the harder half.
+        Three labs right now, plus the one where this started. From the outside the work
+        doesn&rsquo;t look related &mdash; generative diffusion, a retrieval system for scientific
+        papers, gait data from patients &mdash; but what I keep coming back to is evaluation.
+        Working out whether a model is actually better, or just looks better, is usually the
+        harder half.
       </p>
     </header>
 
@@ -207,12 +224,14 @@
           <span class="c-dates">Jun 2026 &ndash; Aug 2026</span>
         </div>
         <h2 class="c-org">Signal Lab</h2>
-        <p class="c-where">Atlanta, GA &middot; diffusion models for generative audio</p>
+        <p class="c-where">Atlanta, GA &middot; generative diffusion models</p>
         <ul>
-          <li>Implemented soft-autoregressive and standard diffusion models in PyTorch/NumPy for Foley sound synthesis (DCASE 2023, 4,850 clips), extending a block-diffusion formulation with autoregressive rollouts from 4s to 14s outputs.</li>
-          <li>Designed a fairness-controlled comparison enforcing identical total noise per datapoint across methods (verified to ~1e-18), then ran multi-seed significance testing (paired t-tests, 95% CIs, effect sizes) isolating a 43% temporal/spectral error reduction (p&lt;0.01) in structured regimes.</li>
-          <li>Built a six-metric evaluation suite (Fr&eacute;chet distance, autocorrelation, power spectrum, diversity, nearest-neighbour realism, distributional divergence) that surfaced a failure mode in the standard FAD/FVD metric, which had ranked a lower-fidelity model first.</li>
-          <li>Ran 40+ multi-GPU SLURM jobs on the PACE HPC cluster, resolving CUDA/driver and storage-quota issues across parallel training and evaluation runs.</li>
+          <li>Implemented and benchmarked soft-autoregressive diffusion against standard diffusion in <strong>PyTorch</strong>, spanning 1D time-series and 2D spatiotemporal PDE (video) generation with <strong>3D U-Net</strong> architectures on <strong>NVIDIA V100 GPUs</strong>.</li>
+          <li>Extended a block-diffusion formulation with autoregressive rollouts for Foley sound synthesis (DCASE 2023, 4,850 clips), pushing generated audio from 4s to 14s.</li>
+          <li>Ran ablations across ~35 configurations on the <strong>PACE HPC cluster</strong> (<strong>SLURM</strong>, multi-GPU), varying seed, width, training length and sequence length under a fairness-controlled protocol &mdash; identical total noise per position across methods, verified to ~1e-18 &mdash; establishing a monotonic dose&ndash;response and up to <strong>75% temporal/spectral error reduction</strong> (relative L2), with multi-seed significance testing (paired t-tests, 95% CIs, effect sizes).</li>
+          <li>Characterised the method as an <strong>inductive bias</strong> rather than a flat win: its advantage is largest under limited model capacity or training budget and converges to parity as resources grow &mdash; a claim that predicts more than a single performance number does.</li>
+          <li>Built a six-metric diagnostic suite (Fr&eacute;chet distance, autocorrelation, power spectrum, Fourier-band error, conservation drift, sample diversity) that surfaced a failure mode in <strong>FVD</strong>, which had ranked a lower-fidelity model first.</li>
+          <li>Debugged and optimised <strong>GPU training pipelines</strong> end to end across 40+ jobs: <strong>CUDA</strong>/driver incompatibilities, <strong>mixed-precision (AMP)</strong> and <strong>TorchDynamo</strong> issues, and distributed-storage bottlenecks.</li>
         </ul>
       </article>
 
@@ -221,11 +240,11 @@
           <span class="c-role">Machine Learning Research Assistant</span>
           <span class="c-dates">May 2026 &ndash; Present</span>
         </div>
-        <h2 class="c-org">Georgia Institute of Technology, Jamali Lab</h2>
+        <h2 class="c-org"><a href="https://vidajamali.github.io/" target="_blank" rel="noopener">Georgia Institute of Technology, Jamali Lab</a><svg class="ext" aria-hidden="true" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.4 8.6 8.6 3.4M4.6 3.4h4v4" /></svg></h2>
         <p class="c-where">Atlanta, GA &middot; grounded retrieval &amp; hallucination measurement</p>
         <ul>
-          <li>Built an end-to-end multi-agent RAG system (self-hosted Qwen 7B on GPU via vLLM) that grounds scientific recommendations in a 50-document corpus and verifies every claim against its cited source, reaching 100% citation validity against a RAG baseline that fabricated references.</li>
-          <li>Engineered a 5-tier evaluation benchmark and automated scoring pipeline, including OCR recovery of image-only PDFs, to measure hallucination in AI-generated scientific claims.</li>
+          <li>Built an end-to-end multi-agent <strong>RAG</strong> system (self-hosted <strong>Qwen 7B</strong> served on GPU via <strong>vLLM</strong>) that grounds scientific recommendations in a 50-document corpus and verifies every claim against its cited source, reaching <strong>100% citation validity</strong> against a RAG baseline that fabricated references.</li>
+          <li>Engineered a 5-tier evaluation benchmark and automated scoring pipeline, including OCR recovery of image-only PDFs, to quantify hallucination in AI-generated scientific claims.</li>
           <li>Extract experimental parameters from unstructured scientific literature into structured, queryable datasets for autonomous experimentation workflows.</li>
         </ul>
         <p class="status"><span class="pip" aria-hidden="true"></span>NeurIPS 2026 workshop paper in progress, with a materials-science lab</p>
@@ -236,14 +255,28 @@
           <span class="c-role">Machine Learning Researcher</span>
           <span class="c-dates">Aug 2025 &ndash; Present</span>
         </div>
-        <h2 class="c-org">Emory University, ViTAL Lab</h2>
-        <p class="c-where">Atlanta, GA &middot; movement-disorder modelling, with Prof. Hyeok Kwon</p>
+        <h2 class="c-org"><a href="https://kwonvitallab.github.io/" target="_blank" rel="noopener">Emory University, ViTAL Lab</a><svg class="ext" aria-hidden="true" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.4 8.6 8.6 3.4M4.6 3.4h4v4" /></svg></h2>
+        <p class="c-where">Atlanta, GA &middot; movement-disorder modelling, with Prof. Hyeokhyen Kwon</p>
         <ul>
-          <li>Build production-style ML/DL pipelines for movement-disorder modelling with Prof. Hyeok Kwon.</li>
-          <li>Developed orthostatic hypotension detection models on full-body gait motion-capture data from 60 patients across 3 walking tasks, using feature-based and deep time-series approaches on Emory BMI servers.</li>
-          <li>Evaluated XGBoost and Random Forest against DeepConvLSTM, ST-GCN, and Transformer baselines, reaching 0.70&ndash;0.80 accuracy across clinical settings.</li>
+          <li>Build an end-to-end ML pipeline to predict orthostatic hypotension in <strong>Parkinson&rsquo;s</strong> patients from <strong>3D motion-capture</strong> gait data &mdash; full-body marker trajectories from 60 patients across 3 walking tasks &mdash; spanning preprocessing, feature extraction, training and evaluation.</li>
+          <li>Implemented and adapted <strong>DeepConvLSTM</strong>, <strong>ST-GCN</strong> and <strong>Transformer</strong> sequence models against XGBoost and Random Forest baselines, and presented the comparison to clinical collaborators.</li>
+          <li>Engineered a <strong>leakage-safe evaluation framework</strong>: patient-grouped repeated k-fold CV so no patient appears in both splits, in-fold FDR-controlled selection over 780+ <strong>TSFRESH</strong> features, and SMOTE for class imbalance &mdash; reporting AUPRC and macro-F1 rather than accuracy, which the majority class was inflating.</li>
+          <li>Designed a cross-medication generalisation experiment (train off-medication, test on-medication) and found that the apparent transfer could reflect <strong>subject-level confounding</strong> rather than physiological signal.</li>
         </ul>
-        <p class="status"><span class="pip" aria-hidden="true"></span>Ongoing work toward authorship</p>
+        <p class="status"><span class="pip" aria-hidden="true"></span>Manuscript in progress</p>
+      </article>
+
+      <article class="card">
+        <div class="c-top">
+          <span class="c-role">Student Researcher</span>
+          <span class="c-dates">Apr 2023 &ndash; Aug 2023</span>
+        </div>
+        <h2 class="c-org"><a href="https://www.lumiere-education.com/" target="_blank" rel="noopener">Lumiere Education</a><svg class="ext" aria-hidden="true" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.4 8.6 8.6 3.4M4.6 3.4h4v4" /></svg></h2>
+        <p class="c-where">Cambridge, MA &middot; dimensionality reduction</p>
+        <ul>
+          <li>Co-authored research with a Yale PhD student on <strong>PCA-based dimensionality reduction</strong>, implementing and evaluating multiple PCA variants in <strong>Python</strong> on high-dimensional datasets.</li>
+          <li>Explored the trade-offs between runtime, explained variance and reconstruction error to compare how the variants actually behave on real data rather than in the asymptotic case.</li>
+        </ul>
       </article>
 
     </div>
@@ -255,16 +288,17 @@
         <p class="m-label">Research methods</p>
         <div class="tags">
           <span>Experimental design</span><span>Significance testing</span><span>Ablation &amp; baseline studies</span>
-          <span>Evaluation benchmark design</span><span>Reproducibility</span><span>Feature engineering</span>
+          <span>Evaluation benchmark design</span><span>Leakage-safe cross-validation</span>
+          <span>Reproducibility</span><span>Feature engineering</span>
         </div>
       </div>
 
       <div class="m-group">
         <p class="m-label">Modelling</p>
         <div class="tags">
-          <span>PyTorch</span><span>Diffusion &amp; generative models</span><span>Transformers</span>
-          <span>Time-series modelling</span><span>Graph neural networks</span><span>Reinforcement learning</span>
-          <span>Computer vision</span><span>scikit-learn</span><span>XGBoost</span>
+          <span>PyTorch</span><span>Diffusion &amp; generative models</span><span>3D U-Nets</span><span>Transformers</span>
+          <span>Time-series modelling</span><span>Graph neural networks</span><span>Imitation learning</span>
+          <span>Computer vision</span><span>Dimensionality reduction (PCA)</span><span>scikit-learn</span><span>XGBoost</span>
         </div>
       </div>
 
@@ -280,7 +314,7 @@
       <div class="m-group">
         <p class="m-label">Infrastructure</p>
         <div class="tags">
-          <span>SLURM</span><span>HPC &amp; multi-GPU training</span><span>CUDA</span>
+          <span>SLURM</span><span>HPC &amp; multi-GPU training</span><span>CUDA</span><span>Mixed precision (AMP)</span>
           <span>GPU model serving</span><span>Linux</span><span>Docker</span><span>Git</span>
           <span>AWS</span><span>GCP</span>
         </div>
