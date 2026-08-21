@@ -4,13 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Projects | Mahika Raj</title>
-  <meta name="description" content="Projects by Mahika Raj: a fuel-aware vision-language UAV navigation pipeline, a multi-agent LLM system with tool-calling, and VeriStack, a feature-registry backend for real-time ML inference." />
+  <meta name="description" content="Projects by Mahika Raj: a fused GroupNorm+SiLU CUDA kernel for diffusion U-Nets, a fuel-aware vision-language UAV navigation pipeline, Mytherium, a multi-agent LLM system with tool-calling, and VeriStack, a feature-registry backend for real-time ML inference." />
   <link rel="canonical" href="https://mahikaraj.com/projects.html" />
 
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Mahika Raj" />
   <meta property="og:title" content="Projects | Mahika Raj" />
-  <meta property="og:description" content="A vision-language UAV navigation pipeline, a multi-agent LLM system with tool-calling, and a feature-registry backend for real-time ML inference." />
+  <meta property="og:description" content="A hand-written CUDA kernel for diffusion U-Nets, a fuel-aware vision-language UAV navigation pipeline, and a Django trading-card web app." />
   <meta property="og:url" content="https://mahikaraj.com/projects.html" />
   <meta property="og:image" content="https://mahikaraj.com/assets/og-card.png" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -113,6 +113,26 @@
       width: 5px; height: 5px; border-radius: 50%; background: var(--accent); opacity: .7;
     }
 
+    .p-link {
+      display: inline-flex; align-items: center; gap: 8px; margin-top: 18px;
+      font-size: 12.5px; letter-spacing: .02em; text-decoration: none;
+      color: rgba(255,255,255,.82);
+      background: rgba(var(--accent-rgb), .07);
+      border: 1px solid rgba(var(--accent-rgb), .28);
+      border-radius: 8px; padding: 8px 14px;
+      transition: background .18s ease, border-color .18s ease, color .18s ease, transform .14s ease;
+    }
+    .p-link:hover {
+      color: #fff; background: rgba(var(--accent-rgb), .14);
+      border-color: rgba(var(--accent-rgb), .55); transform: translateY(-1px);
+    }
+    .p-link .arrow { transition: transform .2s ease; }
+    .p-link:hover .arrow { transform: translateX(3px); }
+    @media (prefers-reduced-motion: reduce) {
+      .p-link, .p-link .arrow { transition: none; }
+      .p-link:hover { transform: none; }
+    }
+
     .cta { width: min(780px, 94vw); margin: 40px auto 0; display: flex; flex-wrap: wrap; gap: 12px; }
     .btn {
       display: inline-flex; align-items: center; gap: 9px;
@@ -162,17 +182,61 @@
       <article class="proj">
         <span class="p-num" aria-hidden="true"></span>
         <div class="p-top">
-          <h2 class="p-title">Vision-Language UAV Navigation</h2>
+          <h2 class="p-title">Fused GroupNorm + SiLU GPU Kernel</h2>
+          <span class="p-dates">Jul 2026 &ndash; Aug 2026</span>
+        </div>
+        <div class="stack">
+          <span>CUDA C++</span><span>Triton</span><span>PyTorch Extensions</span>
+          <span>pybind11</span><span>nvcc</span><span>SASS</span>
+        </div>
+        <ul>
+          <li>Wrote a fused GroupNorm + SiLU CUDA kernel for diffusion U-Net backbones, cutting HBM traffic from 5 to 3 array-sized passes via block-per-group warp-shuffle reductions, fp32 accumulation, and vectorized 128-bit loads verified in SASS.</li>
+          <li>Benchmarked against PyTorch eager, torch.compile, and a Triton port of the same algorithm: 2.3&ndash;3.5&times; over eager and 1.1&ndash;5.0&times; over torch.compile at 48% of peak HBM bandwidth.</li>
+          <li>Found the margin is governed by L2 residency &mdash; once the working set spills past cache every implementation converges on the memory system&rsquo;s limit, so hand tuning only pays on small activations.</li>
+        </ul>
+        <a class="p-link" href="https://github.com/Mahika-raj/fused-groupnorm-silu" target="_blank" rel="noopener">
+          github.com/Mahika-raj/fused-groupnorm-silu <span class="arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </article>
+
+      <article class="proj">
+        <span class="p-num" aria-hidden="true"></span>
+        <div class="p-top">
+          <h2 class="p-title">Fuel-Aware Vision-Language UAV Navigation</h2>
           <span class="p-dates">Jan 2026 &ndash; May 2026</span>
         </div>
         <div class="stack">
-          <span>Python</span><span>PyTorch</span><span>Deep Learning</span>
-          <span>Reinforcement Learning</span><span>Git</span>
+          <span>Python</span><span>PyTorch</span><span>AerialVLN</span>
+          <span>AirSim</span><span>Imitation Learning</span><span>Cross-Modal Attention</span>
         </div>
         <ul>
-          <li>Developed a fuel-aware UAV vision-language navigation pipeline using Teacher Forcing and DAgger on AerialVLN.</li>
-          <li>Evaluated across seen and unseen environments to strengthen robustness and generalization.</li>
+          <li>Extended aerial vision-language navigation with battery awareness on the <strong>AerialVLN</strong> benchmark &mdash; 32.4&nbsp;GB of AirSim/Unreal flights across 25 city-scale environments and 870+ object types &mdash; annotating every timestep with a normalized fuel fraction so the policy could condition on remaining charge.</li>
+          <li>Compared <strong>Seq2Seq</strong> and <strong>Cross-Modal Alignment (CMA)</strong> policies trained with teacher forcing and DAgger. CMA cut navigation error <strong>21.4%</strong> on unseen environments, 218.9&nbsp;m to 172.1&nbsp;m, and lifted success-weighted nDTW from 0.7 to 1.1.</li>
+          <li>Built a FuelGateModule with an auxiliary MSE loss to trade exploration against goal-seeking &mdash; then found it barely moved the needle. Imitation learning already encodes efficient trajectories, and a scalar fuel signal is drowned out by the visual and linguistic features feeding the policy.</li>
         </ul>
+        <a class="p-link" href="https://mahikaraj.com/ML_Masters_Proposal-Midterm/final/" target="_blank" rel="noopener">
+          Read the full report <span class="arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </article>
+
+      <article class="proj">
+        <span class="p-num" aria-hidden="true"></span>
+        <div class="p-top">
+          <h2 class="p-title">Mytherium</h2>
+          <span class="p-dates">Feb 2025 &ndash; May 2025</span>
+        </div>
+        <div class="stack">
+          <span>Django</span><span>Python</span><span>PostgreSQL</span>
+          <span>JavaScript</span><span>HTML/CSS</span><span>Render</span>
+        </div>
+        <ul>
+          <li>Built a deployed Django web app where players collect, trade and quiz on mythical creatures from world cultures &mdash; eight apps covering authentication, collections, a luck-based draw, a marketplace, a myth map, quizzes and notifications.</li>
+          <li>Modelled ownership as a many-to-many relation through a join table so the same creature can belong to many players with per-player state, and built a two-sided <code>Deal</code> model that makes peer-to-peer trades atomic rather than two independent transfers.</li>
+          <li>Wired creature rarity into gameplay: draws are region-scoped and probability-weighted, and creatures grant quiz power-ups &mdash; time boost, eliminate answer, replace question, jump ahead, skip after streak &mdash; so collecting feeds directly back into competing.</li>
+        </ul>
+        <a class="p-link" href="https://github.com/Mahika-raj/Mytherium" target="_blank" rel="noopener">
+          github.com/Mahika-raj/Mytherium <span class="arrow" aria-hidden="true">&rarr;</span>
+        </a>
       </article>
 
       <article class="proj">
@@ -189,6 +253,9 @@
           <li>Built a multi-agent LLM system with tool-calling to support multi-step reasoning and user-facing AI workflows.</li>
           <li>Developed a RAG pipeline with optimized chunking and hybrid search, improving retrieval by 20%.</li>
         </ul>
+        <a class="p-link" href="https://github.com/Mahika-raj/Agentic-Research-Assistant" target="_blank" rel="noopener">
+          github.com/Mahika-raj/Agentic-Research-Assistant <span class="arrow" aria-hidden="true">&rarr;</span>
+        </a>
       </article>
 
       <article class="proj">
@@ -205,6 +272,9 @@
           <li>Built backend ML services with FastAPI for real-time inference and low-latency online feature retrieval.</li>
           <li>Designed a versioned feature registry with reusable SQL features and reproducible offline/online materialization.</li>
         </ul>
+        <a class="p-link" href="https://github.com/Mahika-raj/VeriStack" target="_blank" rel="noopener">
+          github.com/Mahika-raj/VeriStack <span class="arrow" aria-hidden="true">&rarr;</span>
+        </a>
       </article>
 
     </div>
