@@ -1,417 +1,846 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Games | Mahika Raj</title>
-  <meta name="description" content="Stargazer, a constellation memory game. The sky traces a real constellation across a field of stars; trace it back from memory." />
-  <link rel="canonical" href="https://mahikaraj.com/games.html" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Games — Mahika Raj</title>
+<meta name="description" content="Hex — a connection game with no draws, played on a starfield against a Monte Carlo opponent." />
+<link rel="canonical" href="https://mahikaraj.com/games.html" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Mahika Raj" />
+<meta property="og:title" content="Games — Mahika Raj" />
+<meta property="og:description" content="Hex — a connection game with no draws, played on a starfield against a Monte Carlo opponent." />
+<meta property="og:url" content="https://mahikaraj.com/games.html" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+<link rel="alternate icon" href="assets/favicon.ico" />
 
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="Mahika Raj" />
-  <meta property="og:title" content="Games | Mahika Raj" />
-  <meta property="og:description" content="Stargazer, a constellation memory game. The sky traces a real constellation; trace it back from memory." />
-  <meta property="og:url" content="https://mahikaraj.com/games.html" />
-  <meta property="og:image" content="https://mahikaraj.com/assets/og-card.png" />
-  <meta name="twitter:card" content="summary_large_image" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Butterfly+Kids&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-  <link rel="alternate icon" href="assets/favicon.ico" />
+<link rel="stylesheet" href="assets/site.css" />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Butterfly+Kids&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/site.css" />
+<script defer src="https://cloud.umami.is/script.js" data-website-id="bcd0b75a-8c47-4bd3-948d-0540a5566964"></script>
 
-  <style>
-    /* Games runs gold, the playful end of the spectrum. */
-    :root {
-      --accent:      #ffd166;
-      --accent-rgb:  255, 209, 102;
-      --accent-deep: #e0ae3c;
-      --wrong:       #ff6b6b;
-    }
+<style>
+  :root {
+    --bg: #0e0e0e;
+    --ink: #ffffff;
+    --hand: "Butterfly Kids", cursive;
+    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-    html, body { min-height: 100%; background: var(--home-bg); }
-    body { font-family: var(--mono); color: var(--home-text); -webkit-font-smoothing: antialiased; }
+    /* Both sides stay cool. Periwinkle is the site's own; glacier sits far enough
+       round the wheel to read instantly without ever turning warm. */
+    --you: #b0a8e6;
+    --rival: #7ec8d8;
 
-    .page {
-      position: relative; z-index: 5; min-height: 100vh;
-      padding: 148px 22px 92px;
-      opacity: 0; transform: translateY(16px);
-      transition: opacity .8s ease, transform .8s cubic-bezier(.16,1,.3,1);
-    }
-    .page.in { opacity: 1; transform: none; }
-    @media (prefers-reduced-motion: reduce) { .page { transition: none; transform: none; } }
+    --muted: rgba(255, 255, 255, .4);
+    --faint: rgba(255, 255, 255, .13);
+    --ease: cubic-bezier(.25, .8, .25, 1);
+  }
 
-    .head { width: min(720px, 94vw); margin: 0 auto 34px; }
-    .eyebrow {
-      font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
-      color: var(--accent); margin-bottom: 12px;
-    }
-    .head h1 {
-      font-family: var(--hand); font-weight: 400; color: #fff;
-      font-size: clamp(40px, 8vw, 56px); line-height: .95; margin-bottom: 16px;
-    }
-    .head p { font-size: 14.5px; line-height: 1.75; color: rgba(255,255,255,.74); max-width: 58ch; }
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    margin: 0;
+    min-height: 100%;
+    font-family: var(--mono);
+    -webkit-font-smoothing: antialiased;
+  }
 
-    /* ===== the game ===== */
-    /* Only one game for now. .games is already a grid, so a second cabinet
-       drops in beside this one without touching the layout. */
-    .games { width: min(720px, 94vw); margin: 0 auto; display: grid; gap: 24px; }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 34px 18px 90px; }
 
-    .cabinet {
-      background: rgba(255,255,255,.035);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 18px; overflow: hidden;
-    }
-    .cab-bar {
-      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-      padding: 13px 18px; background: rgba(255,255,255,.045);
-      border-bottom: 1px solid rgba(255,255,255,.08);
-    }
-    .cab-name { font-size: 12.5px; letter-spacing: .06em; color: rgba(255,255,255,.9); font-weight: 600; }
-    .cab-tag { font-size: 11px; letter-spacing: .04em; color: rgba(255,255,255,.4); }
-    .scores { margin-left: auto; display: flex; gap: 16px; font-size: 11.5px; letter-spacing: .04em; }
-    .scores b { color: var(--accent); font-weight: 600; }
-    .scores span { color: rgba(255,255,255,.45); }
+  .nav { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 44px; }
+  .nav a {
+    font-family: var(--mono); font-size: 12px; letter-spacing: .02em;
+    color: rgba(255, 255, 255, .42); text-decoration: none;
+    transition: color 260ms var(--ease);
+  }
+  .nav a:hover { color: var(--ink); }
+  .nav a[aria-current="page"] { color: var(--you); }
 
-    /* sky */
-    .sky {
-      position: relative; width: 100%; aspect-ratio: 16 / 11;
-      background:
-        radial-gradient(ellipse at 30% 20%, rgba(255,209,102,.05), transparent 60%),
-        #090909;
-      touch-action: manipulation;
-    }
-    @media (max-width: 620px) { .sky { aspect-ratio: 1 / 1; } }
+  .title {
+    font-family: var(--hand); font-size: clamp(48px, 12vw, 80px);
+    line-height: 1; text-align: center; margin: 0 0 12px; font-weight: 400;
+  }
+  .tagline { text-align: center; font-size: 12px; line-height: 1.85; color: var(--muted); margin: 0 0 36px; }
 
-    .sky svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-    .sky svg line {
-      stroke: var(--accent); stroke-width: 1.6; stroke-linecap: round;
-      vector-effect: non-scaling-stroke; opacity: .85;
-    }
-    .sky svg line.ghost { stroke: rgba(255,255,255,.3); }
+  .controls { display: flex; flex-wrap: wrap; gap: 16px 24px; justify-content: center; margin-bottom: 28px; }
+  .group { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+  .group-label { font-size: 10px; letter-spacing: .1em; color: rgba(255, 255, 255, .28); }
+  .seg { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+  .group.off { opacity: .28; pointer-events: none; }
 
-    .star {
-      position: absolute; width: 30px; height: 30px; padding: 0;
-      transform: translate(-50%, -50%);
-      background: none; border: none; border-radius: 50%;
-      display: grid; place-items: center;
-    }
-    .star::after {
-      content: ""; width: 7px; height: 7px; border-radius: 50%;
-      background: rgba(255,255,255,.5);
-      box-shadow: 0 0 0 0 rgba(255,209,102,0);
-      transition: background .2s ease, width .2s ease, height .2s ease, box-shadow .3s ease;
-    }
-    .star:hover::after { background: rgba(255,255,255,.9); }
-    .star.on::after {
-      background: var(--accent); width: 12px; height: 12px;
-      box-shadow: 0 0 0 7px rgba(255,209,102,.18);
-    }
-    .star.bad::after {
-      background: var(--wrong); width: 12px; height: 12px;
-      box-shadow: 0 0 0 7px rgba(255,107,107,.2);
-    }
-    .sky.locked .star { pointer-events: none; }
-    @media (prefers-reduced-motion: reduce) { .star::after { transition: none; } }
+  .chip {
+    font-family: var(--mono); font-size: 11px; color: rgba(255, 255, 255, .48);
+    background: transparent; border: 1.5px solid var(--faint); border-radius: 999px;
+    padding: 6px 14px; cursor: pointer;
+    transition: color 240ms var(--ease), border-color 240ms var(--ease), background 240ms var(--ease);
+  }
+  .chip:hover { color: var(--ink); border-color: rgba(255, 255, 255, .3); }
+  .chip[aria-pressed="true"] { color: var(--you); border-color: var(--you); background: rgba(176, 168, 230, .1); }
+  .chip:focus-visible { outline: 2px solid var(--you); outline-offset: 2px; }
 
-    /* status bar under the sky */
-    .cab-foot {
-      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-      padding: 15px 18px; border-top: 1px solid rgba(255,255,255,.08);
-      min-height: 62px;
-    }
-    .status { font-size: 13px; line-height: 1.5; color: rgba(255,255,255,.78); flex: 1; min-width: 200px; }
-    .status b { color: var(--accent); font-weight: 600; }
-    .status .win { color: var(--accent); }
-    .status .lose { color: var(--wrong); }
+  .stage { position: relative; margin: 0 auto; width: fit-content; }
+  .stage svg { display: block; }
+  #stars { position: absolute; pointer-events: none; }
+  #board { position: relative; }
 
-    .play {
-      font-family: var(--mono); font-size: 13px; letter-spacing: .02em; font-weight: 600;
-      color: #17130a; background: var(--accent); border: none; border-radius: 9px;
-      padding: 10px 20px;
-      transition: background .18s ease, transform .14s ease;
-    }
-    .play:hover { background: #ffdc8a; transform: translateY(-1px); }
-    .play:active { transform: none; }
+  .cell { fill: rgba(19, 19, 25, .58); stroke: rgba(255, 255, 255, .075); stroke-width: 1; transition: fill 200ms var(--ease); }
+  .cell.free { cursor: pointer; }
+  .cell.free:hover { fill: rgba(46, 44, 62, .8); }
+  .cell:focus-visible { outline: none; stroke: var(--you); stroke-width: 2; }
 
-    .how {
-      width: min(720px, 94vw); margin: 26px auto 0;
-      font-size: 12.5px; line-height: 1.8; color: rgba(255,255,255,.5);
-      border-top: 1px solid rgba(255,255,255,.09); padding-top: 20px;
-    }
-    .how b { color: rgba(255,255,255,.78); font-weight: 600; }
-    .how kbd {
-      font-family: var(--mono); font-size: 11px;
-      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16);
-      border-radius: 4px; padding: 1px 6px; color: rgba(255,255,255,.8);
-    }
+  .stone { transition: opacity 320ms var(--ease); }
+  .stone.fresh { animation: drop 340ms var(--ease); transform-box: fill-box; transform-origin: center; }
+  @keyframes drop { from { transform: scale(.3); opacity: 0; } }
 
-    @media (max-width: 560px) {
-      .page { padding: 132px 16px 88px; }
-      .scores { margin-left: 0; width: 100%; }
-    }
-  </style>
-<script defer src="https://cloud.umami.is/script.js" data-website-id="bcd0b75a-8c47-4bd3-948d-0540a5566964"></script></head>
+  .link { stroke-width: 1.4; opacity: .5; }
+  .bridge { stroke-width: 1.2; stroke-dasharray: 2.5 3.5; opacity: .32; }
 
+  .twinkle { animation: tw 5s var(--ease) infinite alternate; }
+  @keyframes tw { from { opacity: .1; } to { opacity: .48; } }
+
+  .trace {
+    fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: var(--len); stroke-dashoffset: var(--len);
+    animation: draw 1000ms var(--ease) forwards;
+  }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+
+  .status { text-align: center; font-size: 13px; min-height: 22px; margin: 24px 0 0; color: var(--you); }
+  .status[data-tone="rival"] { color: var(--rival); }
+  .status[data-tone="quiet"] { color: var(--muted); }
+
+  .meta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 18px; }
+  .record { font-size: 11px; color: var(--muted); }
+  .record b { color: var(--you); font-weight: 500; }
+  .record i { color: var(--rival); font-style: normal; font-weight: 500; }
+
+  .legend { display: flex; gap: 22px; justify-content: center; flex-wrap: wrap;
+    font-size: 10px; color: rgba(255, 255, 255, .32); margin-top: 20px; }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; vertical-align: -1px; margin-right: 6px; }
+
+  .rules { margin-top: 54px; border-top: 1px solid rgba(255, 255, 255, .07); padding-top: 22px; }
+  .rules summary { font-size: 12px; color: var(--muted); cursor: pointer; list-style: none; transition: color 220ms var(--ease); }
+  .rules summary:hover { color: var(--ink); }
+  .rules summary::-webkit-details-marker { display: none; }
+  .rules summary::before { content: "+ "; color: var(--you); }
+  .rules[open] summary::before { content: "\2212 "; }
+  .rules h4 { font-size: 11px; font-weight: 500; color: var(--you); margin: 22px 0 6px; letter-spacing: .04em; }
+  .rules p { font-size: 12px; line-height: 1.95; color: rgba(255, 255, 255, .48); max-width: 56ch; margin: 0; }
+  .rules em { color: var(--you); font-style: normal; }
+
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .trace { stroke-dashoffset: 0; }
+    .twinkle { opacity: .3; }
+  }
+</style>
+</head>
 <body>
 
-  <a class="skip-link" href="#main">Skip to content</a>
-  <canvas id="stars" aria-hidden="true"></canvas>
+<div class="wrap">
 
-  <a class="site-mark" href="index.html" aria-label="Mahika Raj, home"><span class="mk-full">Mahika Raj</span><span class="mk-short">MR</span></a>
-  <nav class="site-nav" aria-label="Primary">
+  <nav class="nav">
     <a href="about.html">About</a>
     <a href="research.html">Research</a>
     <a href="projects.html">Projects</a>
-    <a href="games.html" class="active" aria-current="page">Games</a>
-    <a href="contact.html">Contact me</a>
+    <a href="games.html" aria-current="page">Games</a>
+    <a href="contact.html">Contact</a>
   </nav>
 
-  <main class="page" id="main">
-    <header class="head">
-      <p class="eyebrow">// 88 of them, and counting</p>
-      <h1>Games</h1>
-      <p>
-        The constellations on every other page finally have something to do.
-      </p>
-    </header>
+  <h1 class="title">Hex</h1>
+  <p class="tagline">
+    place a stone, link your two edges.<br />
+    every finished board holds exactly one chain — so nobody ever draws.
+  </p>
 
-    <div class="games">
-      <section class="cabinet">
-        <div class="cab-bar">
-          <span class="cab-name">Stargazer</span>
-          <span class="cab-tag">constellation memory</span>
-          <span class="scores">
-            <span>round <b id="scoreRound">0</b></span>
-            <span>best <b id="scoreBest">0</b></span>
-          </span>
-        </div>
-
-        <div class="sky locked" id="sky">
-          <svg id="lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
-        </div>
-
-        <div class="cab-foot">
-          <p class="status" id="status" role="status" aria-live="polite">
-            The sky traces a real constellation. Trace it back from memory.
-          </p>
-          <button class="play" id="play" type="button">Start</button>
-        </div>
-      </section>
+  <div class="controls">
+    <div class="group">
+      <span class="group-label" id="l-mode">mode</span>
+      <div class="seg" role="group" aria-labelledby="l-mode" id="modes"></div>
     </div>
+    <div class="group">
+      <span class="group-label" id="l-size">board</span>
+      <div class="seg" role="group" aria-labelledby="l-size" id="sizes"></div>
+    </div>
+    <div class="group" id="g-level">
+      <span class="group-label" id="l-level">opponent</span>
+      <div class="seg" role="group" aria-labelledby="l-level" id="levels"></div>
+    </div>
+    <div class="group">
+      <span class="group-label" id="l-act">game</span>
+      <div class="seg" role="group" aria-labelledby="l-act">
+        <button class="chip" id="btn-new" type="button">new</button>
+        <button class="chip" id="btn-undo" type="button">undo</button>
+        <button class="chip" id="btn-links" type="button" aria-pressed="true">links</button>
+      </div>
+    </div>
+  </div>
 
-    <p class="how">
-      <b>How to play.</b> Watch the sky connect a constellation, then click its stars back in
-      the same order. One wrong star ends the run. Keyboard works too:
-      <kbd>Tab</kbd> between stars, <kbd>Enter</kbd> to pick one.
+  <div class="stage" id="stage">
+    <svg id="stars" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"></svg>
+    <svg id="board" role="group" xmlns="http://www.w3.org/2000/svg"
+         aria-label="Hex board. Arrow keys move between cells, Enter places a stone."></svg>
+  </div>
+
+  <p class="status" id="status" role="status">your move</p>
+
+  <div class="meta"><span class="record" id="record"></span></div>
+
+  <div class="legend" id="legend"></div>
+
+  <details class="rules">
+    <summary>how it works</summary>
+
+    <h4>the game</h4>
+    <p>
+      Take turns placing stones on empty cells. You win by building an unbroken chain
+      from the left edge to the right; the machine links top to bottom. Every filled
+      board contains exactly one such chain, which is why <em>draws are impossible</em> —
+      a fact equivalent to the Brouwer fixed-point theorem.
     </p>
-  </main>
 
-  <footer class="site-footer">© 2026 Mahika Raj</footer>
+    <h4>the threads</h4>
+    <p>
+      Solid threads join stones that touch. Dashed threads mark <em>bridges</em>: two stones
+      a step apart sharing two empty cells. A bridge is as good as a connection, because
+      if your opponent takes one of the two cells you simply take the other. Learning to
+      see bridges is most of learning Hex, so the board draws them for you.
+    </p>
 
-  <script src="assets/cursor.js"></script>
-  <script src="assets/stars.js"></script>
-  <script src="assets/nav.js"></script>
+    <h4>reverse</h4>
+    <p>
+      Same board, inverted goal: whoever completes a chain <em>loses</em>. Every instinct you
+      build in the normal game turns against you, and the endgames get strange.
+    </p>
 
-  <script>
-  /* ==========================================================================
-     Stargazer.
+    <h4>the swap</h4>
+    <p>
+      Moving first is a real advantage, so after your opening stone the machine may mirror
+      it across the diagonal and claim it. That one option is enough to make the game fair,
+      and it means your first move wants to be good but not <em>obviously best</em>.
+    </p>
 
-     Real constellations, in roughly ascending star count. Coordinates are
-     normalised 0-1 within the sky box and traced as a single polyline, which
-     is why the shapes here are the ones astronomers actually draw as a line
-     (Cassiopeia's W, the Plough) rather than the branching ones like Cygnus.
+    <h4>the opponent</h4>
+    <p>
+      No opening book, no evaluation function. Before each move it plays thousands of games
+      out from the current position, filling the board at random and seeing who ends up
+      connected, then picks whatever won most often. <em>Deep</em> buys it more time to think,
+      not more knowledge.
+    </p>
+  </details>
 
-     The stars are real <button> elements rather than canvas hit-testing, so
-     Tab, Enter, and focus rings all work for free. Only the connecting lines
-     are drawn (as SVG) underneath.
-     ====================================================================== */
-  (function () {
-    var SHAPES = [
-      { name: 'Corvus',      sub: 'the crow',    stars: [[.18,.64],[.30,.24],[.72,.30],[.66,.76]] },
-      { name: 'Cassiopeia',  sub: 'the queen',   stars: [[.07,.36],[.28,.72],[.50,.30],[.72,.74],[.93,.28]] },
-      { name: 'Lyra',        sub: 'the lyre',    stars: [[.46,.10],[.33,.37],[.40,.73],[.68,.75],[.63,.39]] },
-      { name: 'Cepheus',     sub: 'the king',    stars: [[.27,.74],[.27,.37],[.52,.11],[.77,.35],[.72,.73]] },
-      { name: 'Delphinus',   sub: 'the dolphin', stars: [[.22,.79],[.42,.53],[.39,.26],[.63,.20],[.67,.47]] },
-      { name: 'Ursa Major',  sub: 'the plough',  stars: [[.06,.30],[.22,.39],[.37,.46],[.52,.51],[.58,.73],[.81,.75],[.83,.47]] }
-    ];
+</div>
 
-    var sky      = document.getElementById('sky');
-    var linesSvg = document.getElementById('lines');
-    var statusEl = document.getElementById('status');
-    var playBtn  = document.getElementById('play');
-    var roundEl  = document.getElementById('scoreRound');
-    var bestEl   = document.getElementById('scoreBest');
-    if (!sky) return;
+<!--
+  If your other pages load shared scripts at the end of <body> — the site starfield,
+  the custom cursor — copy those exact <script> tags from about.html and paste them
+  below. The stars behind the board are local to the board and won't collide.
+-->
 
-    var SVG_NS = 'http://www.w3.org/2000/svg';
-    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var STEP = reduce ? 320 : 540;   // pace of the demo trace
+<script>
+(function () {
+  "use strict";
 
-    var round = 0, seq = [], progress = 0, points = [], buttons = [], timers = [];
-    var best = 0;
-    try { best = parseInt(localStorage.getItem('stargazer.best') || '0', 10) || 0; } catch (e) {}
-    bestEl.textContent = best;
+  var store = {
+    get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  };
 
-    function clearTimers() {
-      timers.forEach(clearTimeout);
-      timers = [];
-    }
-    function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+  var YOU = 1, RIVAL = 2;
+  var SIZES = [5, 7, 9, 11];
+  var LEVELS = [
+    { label: "quick",  budget: 220 },
+    { label: "steady", budget: 900 },
+    { label: "deep",   budget: 2400 }
+  ];
+  var MODES = [
+    { id: "classic", label: "vs machine" },
+    { id: "reverse", label: "reverse" },
+    { id: "duo",     label: "two players" }
+  ];
 
-    function clearLines() {
-      while (linesSvg.firstChild) linesSvg.removeChild(linesSvg.firstChild);
-    }
+  /* Six directions to a touching neighbour. */
+  var NB = [[0, -1], [0, 1], [-1, 0], [-1, 1], [1, -1], [1, 0]];
+  /* Six directions to a bridge partner: two apart, sharing exactly two cells. */
+  var BR = [[-1, 2], [-2, 1], [-1, -1], [1, -2], [2, -1], [1, 1]];
 
-    function drawLine(a, b, ghost) {
-      var ln = document.createElementNS(SVG_NS, 'line');
-      ln.setAttribute('x1', (points[a][0] * 100).toFixed(2));
-      ln.setAttribute('y1', (points[a][1] * 100).toFixed(2));
-      ln.setAttribute('x2', (points[b][0] * 100).toFixed(2));
-      ln.setAttribute('y2', (points[b][1] * 100).toFixed(2));
-      if (ghost) ln.setAttribute('class', 'ghost');
-      linesSvg.appendChild(ln);
-    }
+  var n = parseInt(store.get("hex.size"), 10) || 7;
+  if (SIZES.indexOf(n) < 0) n = 7;
+  var level = parseInt(store.get("hex.level"), 10);
+  if (isNaN(level) || level < 0 || level > 2) level = 1;
+  var mode = store.get("hex.mode") || "classic";
+  if (!MODES.some(function (m) { return m.id === mode; })) mode = "classic";
+  var showLinks = store.get("hex.links") !== "0";
 
-    /* Decoys are rejection-sampled so they never crowd a real star (or each
-       other) closely enough to make the puzzle a coin-flip. */
-    function buildField(shape, decoyCount) {
-      var pts = shape.stars.map(function (s) { return [s[0], s[1]]; });
-      var MIN = 0.11, guard = 0;
-      while (pts.length < shape.stars.length + decoyCount && guard++ < 4000) {
-        var c = [0.06 + Math.random() * 0.88, 0.08 + Math.random() * 0.84];
-        var ok = pts.every(function (p) { return Math.hypot(p[0] - c[0], p[1] - c[1]) > MIN; });
-        if (ok) pts.push(c);
-      }
-      return pts;
-    }
+  var cells, adj, bridges, history, moveCount, turn, over, busy, last, winner;
+  var W, H, VS, OFF, starField = [];
+  var buf, seen, stack, shuf, empties;
 
-    /* Every star looks identical. The decoys are only decoys because they
-       weren't in the trace. Marking them would give the puzzle away. */
-    function render() {
-      buttons.forEach(function (b) { b.remove(); });
-      buttons = [];
-      points.forEach(function (p, i) {
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'star';
-        b.style.left = (p[0] * 100) + '%';
-        b.style.top  = (p[1] * 100) + '%';
-        b.setAttribute('aria-label', 'Star ' + (i + 1) + ' of ' + points.length);
-        b.addEventListener('click', function () { pick(i); });
-        sky.appendChild(b);
-        buttons.push(b);
-      });
-    }
+  var stage = document.getElementById("stage");
+  var starsEl = document.getElementById("stars");
+  var boardEl = document.getElementById("board");
+  var statusEl = document.getElementById("status");
+  var recordEl = document.getElementById("record");
+  var legendEl = document.getElementById("legend");
 
-    function lit(on) {
-      buttons.forEach(function (b) { b.classList.remove('on', 'bad'); });
-      (on || []).forEach(function (i) { buttons[i].classList.add('on'); });
-    }
+  /* ---------------- geometry ---------------- */
 
-    function nextRound() {
-      clearTimers();
-      var shape = SHAPES[round % SHAPES.length];
-      var decoys = Math.min(4 + round * 2, 15);
+  function measure() {
+    var avail = Math.min(stage.parentNode.clientWidth || 640, 640) - 12;
+    W = Math.max(15, Math.min(44, Math.floor(avail / (n + (n - 1) / 2))));
+    H = W * 2 / Math.sqrt(3);
+    VS = H * 0.75;
+    OFF = W / 2;
+  }
+  function cx(r, c) { return c * W + r * OFF; }
+  function cy(r) { return r * VS; }
+  function centre(k) { var r = (k / n) | 0; return [cx(r, k % n) + W / 2, cy(r) + H / 2]; }
+  function boardW() { return n * W + (n - 1) * OFF; }
+  function boardH() { return (n - 1) * VS + H; }
 
-      points = buildField(shape, decoys);
-      seq = shape.stars.map(function (_, i) { return i; });   // real stars are indices 0..n-1
-      progress = 0;
+  /* ---------------- topology ---------------- */
 
-      render();
-      clearLines();
-      lit([]);
-      sky.classList.add('locked');
-
-      roundEl.textContent = round + 1;
-      statusEl.innerHTML = 'Round <b>' + (round + 1) + '</b>. Watch the sky&hellip;';
-
-      // Trace the constellation, one star at a time.
-      seq.forEach(function (idx, k) {
-        later(function () {
-          buttons[idx].classList.add('on');
-          if (k > 0) drawLine(seq[k - 1], idx);
-        }, 620 + k * STEP);
-      });
-
-      // Then wipe it and hand over.
-      later(function () {
-        clearLines();
-        lit([]);
-        sky.classList.remove('locked');
-        statusEl.innerHTML = 'Your turn. Trace it back: <b>' + seq.length + '</b> stars.';
-        var first = buttons[0];
-        if (first) first.focus({ preventScroll: true });
-      }, 620 + seq.length * STEP + 640);
-    }
-
-    function pick(i) {
-      if (sky.classList.contains('locked')) return;
-
-      if (i !== seq[progress]) {
-        buttons[i].classList.add('bad');
-        sky.classList.add('locked');
-        var shape = SHAPES[round % SHAPES.length];
-        statusEl.innerHTML =
-          '<span class="lose">Not that one.</span> That was <b>' + shape.name +
-          '</b>, ' + shape.sub + '. You cleared <b>' + round + '</b> ' +
-          (round === 1 ? 'round' : 'rounds') + '.';
-        // show the answer
-        seq.forEach(function (idx, k) { if (k > 0) drawLine(seq[k - 1], idx, true); });
-        lit(seq);
-        buttons[i].classList.remove('on');
-        buttons[i].classList.add('bad');
-        playBtn.textContent = 'Play again';
-        playBtn.hidden = false;
-        return;
-      }
-
-      buttons[i].classList.add('on');
-      if (progress > 0) drawLine(seq[progress - 1], i);
-      progress++;
-
-      if (progress === seq.length) {
-        sky.classList.add('locked');
-        round++;
-        if (round > best) {
-          best = round;
-          bestEl.textContent = best;
-          try { localStorage.setItem('stargazer.best', String(best)); } catch (e) {}
+  function buildTopology() {
+    adj = []; bridges = [];
+    var r, c, i, nr, nc;
+    for (r = 0; r < n; r++) {
+      for (c = 0; c < n; c++) {
+        var near = [];
+        for (i = 0; i < 6; i++) {
+          nr = r + NB[i][0]; nc = c + NB[i][1];
+          if (nr >= 0 && nr < n && nc >= 0 && nc < n) near.push(nr * n + nc);
         }
-        var shape = SHAPES[(round - 1) % SHAPES.length];
-        statusEl.innerHTML =
-          '<span class="win">&#10003; ' + shape.name + '</span>, ' + shape.sub + '.';
-        later(nextRound, 1500);
+        adj.push(near);
+        var br = [];
+        for (i = 0; i < 6; i++) {
+          nr = r + BR[i][0]; nc = c + BR[i][1];
+          if (nr >= 0 && nr < n && nc >= 0 && nc < n) br.push({ to: nr * n + nc, carriers: [] });
+        }
+        bridges.push(br);
+      }
+    }
+    /* Carriers are exactly the cells both ends of a bridge touch. */
+    for (var k = 0; k < n * n; k++) {
+      for (i = 0; i < bridges[k].length; i++) {
+        var b = bridges[k][i];
+        b.carriers = adj[k].filter(function (x) { return adj[b.to].indexOf(x) >= 0; });
+      }
+    }
+  }
+
+  function connected(board, player) {
+    seen.fill(0);
+    var top = 0, i, k;
+    if (player === YOU) {
+      for (i = 0; i < n; i++) { k = i * n; if (board[k] === player) { seen[k] = 1; stack[top++] = k; } }
+    } else {
+      for (i = 0; i < n; i++) if (board[i] === player) { seen[i] = 1; stack[top++] = i; }
+    }
+    while (top > 0) {
+      k = stack[--top];
+      if (player === YOU ? (k % n) === n - 1 : ((k / n) | 0) === n - 1) return true;
+      var L = adj[k];
+      for (i = 0; i < L.length; i++) {
+        var nk = L[i];
+        if (!seen[nk] && board[nk] === player) { seen[nk] = 1; stack[top++] = nk; }
+      }
+    }
+    return false;
+  }
+
+  /* Breadth-first, so the traced chain is the shortest one rather than a ragged walk. */
+  function chainOf(player) {
+    var parent = new Int32Array(n * n).fill(-1), q = [], i, k;
+    if (player === YOU) {
+      for (i = 0; i < n; i++) { k = i * n; if (cells[k] === player) { parent[k] = k; q.push(k); } }
+    } else {
+      for (i = 0; i < n; i++) if (cells[i] === player) { parent[i] = i; q.push(i); }
+    }
+    for (var h = 0; h < q.length; h++) {
+      k = q[h];
+      if (player === YOU ? (k % n) === n - 1 : ((k / n) | 0) === n - 1) {
+        var path = [], cur = k;
+        while (parent[cur] !== cur) { path.push(cur); cur = parent[cur]; }
+        path.push(cur);
+        return path.reverse();
+      }
+      var L = adj[k];
+      for (i = 0; i < L.length; i++) {
+        var nk = L[i];
+        if (parent[nk] === -1 && cells[nk] === player) { parent[nk] = k; q.push(nk); }
+      }
+    }
+    return [];
+  }
+
+  /* ---------------- search ---------------- */
+
+  function collect() {
+    empties.length = 0;
+    for (var i = 0; i < cells.length; i++) if (!cells[i]) empties.push(i);
+    return empties;
+  }
+
+  /* In reverse the machine wants YOU to be the one who connects. */
+  function target() { return mode === "reverse" ? YOU : RIVAL; }
+
+  function playout(move) {
+    buf.set(cells);
+    buf[move] = RIVAL;
+    var m = 0, i;
+    for (i = 0; i < empties.length; i++) if (empties[i] !== move) shuf[m++] = empties[i];
+    for (i = m - 1; i > 0; i--) {
+      var j = (Math.random() * (i + 1)) | 0, t = shuf[i];
+      shuf[i] = shuf[j]; shuf[j] = t;
+    }
+    for (i = 0; i < m; i++) buf[shuf[i]] = (i & 1) === 0 ? YOU : RIVAL;
+    return connected(buf, target());
+  }
+
+  /* Rough read on who is ahead, used only to decide the swap. */
+  function evaluate(samples) {
+    collect();
+    var wins = 0;
+    for (var s = 0; s < samples; s++) {
+      buf.set(cells);
+      var m = 0, i;
+      for (i = 0; i < empties.length; i++) shuf[m++] = empties[i];
+      for (i = m - 1; i > 0; i--) {
+        var j = (Math.random() * (i + 1)) | 0, t = shuf[i];
+        shuf[i] = shuf[j]; shuf[j] = t;
+      }
+      for (i = 0; i < m; i++) buf[shuf[i]] = (i & 1) === 0 ? RIVAL : YOU;
+      if (connected(buf, RIVAL)) wins++;
+    }
+    return wins / samples;
+  }
+
+  /* Never lose to something visible in a single ply. */
+  function tactical() {
+    var i, k, v;
+    if (mode === "reverse") {
+      var safe = [];
+      for (i = 0; i < empties.length; i++) {
+        k = empties[i]; cells[k] = RIVAL; v = connected(cells, RIVAL); cells[k] = 0;
+        if (!v) safe.push(k);
+      }
+      if (safe.length && safe.length < empties.length) {
+        empties.length = 0;
+        for (i = 0; i < safe.length; i++) empties.push(safe[i]);
+      }
+      return -1;
+    }
+    for (i = 0; i < empties.length; i++) {
+      k = empties[i]; cells[k] = RIVAL; v = connected(cells, RIVAL); cells[k] = 0;
+      if (v) return k;
+    }
+    for (i = 0; i < empties.length; i++) {
+      k = empties[i]; cells[k] = YOU; v = connected(cells, YOU); cells[k] = 0;
+      if (v) return k;
+    }
+    return -1;
+  }
+
+  /* Sliced across timeouts so the board never freezes while it thinks. */
+  function think(budget, done) {
+    collect();
+    if (!empties.length) { done(-1); return; }
+
+    var forced = tactical();
+    if (forced >= 0) { setTimeout(function () { done(forced); }, 70); return; }
+
+    var moves = empties.slice();
+    var wins = new Int32Array(moves.length);
+    var visits = new Int32Array(moves.length);
+    var cursor = 0;
+    var deadline = performance.now() + budget;
+
+    function slice() {
+      var end = Math.min(performance.now() + 22, deadline);
+      while (performance.now() < end) {
+        for (var b = 0; b < 20; b++) {
+          var e = cursor++ % moves.length;
+          if (playout(moves[e])) wins[e]++;
+          visits[e]++;
+        }
+      }
+      if (performance.now() < deadline) { setTimeout(slice, 0); return; }
+      var best = 0, bestRate = -1;
+      for (var i = 0; i < moves.length; i++) {
+        if (!visits[i]) continue;
+        var rate = wins[i] / visits[i];
+        if (rate > bestRate) { bestRate = rate; best = i; }
+      }
+      done(moves[best]);
+    }
+    slice();
+  }
+
+  /* ---------------- painting ---------------- */
+
+  function seedStars() {
+    starField = [];
+    var w = boardW(), h = boardH();
+    var count = Math.max(24, Math.round((w * h) / 1400));
+    for (var i = 0; i < count; i++) {
+      starField.push({
+        x: Math.random() * (w + 40) - 20,
+        y: Math.random() * (h + 40) - 20,
+        r: 0.5 + Math.random() * 1.1,
+        d: (Math.random() * 5).toFixed(2)
+      });
+    }
+  }
+
+  function paintStars() {
+    var w = boardW(), h = boardH();
+    starsEl.setAttribute("viewBox", "-20 -20 " + (w + 40) + " " + (h + 40));
+    starsEl.setAttribute("width", w + 40);
+    starsEl.setAttribute("height", h + 40);
+    starsEl.style.left = "-20px";
+    starsEl.style.top = "-20px";
+    starsEl.innerHTML = starField.map(function (s) {
+      return '<circle class="twinkle" cx="' + s.x.toFixed(1) + '" cy="' + s.y.toFixed(1) +
+        '" r="' + s.r.toFixed(2) + '" fill="#cfcae8" style="animation-delay:-' + s.d + 's"/>';
+    }).join("");
+  }
+
+  function hexPoints(r, c) {
+    var x = cx(r, c), y = cy(r);
+    return [[x + W / 2, y], [x + W, y + H * .25], [x + W, y + H * .75],
+            [x + W / 2, y + H], [x, y + H * .75], [x, y + H * .25]]
+      .map(function (p) { return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join(" ");
+  }
+
+  function colourOf(p) { return p === YOU ? "#b0a8e6" : "#7ec8d8"; }
+
+  function paint() {
+    var w = boardW(), h = boardH();
+    boardEl.setAttribute("viewBox", "0 0 " + w + " " + h);
+    boardEl.setAttribute("width", w);
+    boardEl.setAttribute("height", h);
+
+    var s = "", r, c, i, k, x, y;
+
+    var eL = [], eR = [], eT = [], eB = [];
+    for (r = 0; r < n; r++) {
+      x = cx(r, 0); y = cy(r);
+      eL.push([x, y + H * .25], [x, y + H * .75]);
+      x = cx(r, n - 1);
+      eR.push([x + W, y + H * .25], [x + W, y + H * .75]);
+    }
+    for (c = 0; c < n; c++) {
+      x = cx(0, c); y = cy(0);
+      eT.push([x, y + H * .25], [x + W / 2, y], [x + W, y + H * .25]);
+      x = cx(n - 1, c); y = cy(n - 1);
+      eB.push([x, y + H * .75], [x + W / 2, y + H], [x + W, y + H * .75]);
+    }
+    function edge(pts, col) {
+      return '<polyline points="' + pts.map(function (p) { return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join(" ") +
+        '" fill="none" stroke="' + col + '" stroke-width="2.5" opacity=".42" stroke-linejoin="round"/>';
+    }
+    s += edge(eL, "#b0a8e6") + edge(eR, "#b0a8e6") + edge(eT, "#7ec8d8") + edge(eB, "#7ec8d8");
+
+    for (r = 0; r < n; r++) {
+      for (c = 0; c < n; c++) {
+        k = r * n + c;
+        var open = !cells[k] && !over;
+        s += '<polygon class="cell' + (open ? " free" : "") + '" data-k="' + k +
+          '" tabindex="' + (open ? 0 : -1) + '" points="' + hexPoints(r, c) + '"/>';
       }
     }
 
-    playBtn.addEventListener('click', function () {
-      round = 0;
-      playBtn.hidden = true;
-      nextRound();
-    });
+    if (showLinks) {
+      var drawn = {};
+      for (k = 0; k < n * n; k++) {
+        if (!cells[k]) continue;
+        var a = centre(k), col = colourOf(cells[k]);
+        for (i = 0; i < adj[k].length; i++) {
+          var nk = adj[k][i];
+          if (cells[nk] !== cells[k] || drawn["a" + k + "_" + nk]) continue;
+          drawn["a" + nk + "_" + k] = 1;
+          var p = centre(nk);
+          s += '<line class="link" x1="' + a[0].toFixed(1) + '" y1="' + a[1].toFixed(1) +
+            '" x2="' + p[0].toFixed(1) + '" y2="' + p[1].toFixed(1) + '" stroke="' + col + '"/>';
+        }
+        for (i = 0; i < bridges[k].length; i++) {
+          var b = bridges[k][i];
+          if (cells[b.to] !== cells[k] || drawn["b" + k + "_" + b.to]) continue;
+          if (b.carriers.length < 2) continue;
+          var blocked = false;
+          for (var ci = 0; ci < b.carriers.length; ci++) if (cells[b.carriers[ci]]) blocked = true;
+          if (blocked) continue;
+          drawn["b" + b.to + "_" + k] = 1;
+          var q = centre(b.to);
+          s += '<line class="bridge" x1="' + a[0].toFixed(1) + '" y1="' + a[1].toFixed(1) +
+            '" x2="' + q[0].toFixed(1) + '" y2="' + q[1].toFixed(1) + '" stroke="' + col + '"/>';
+        }
+      }
+    }
 
-    /* Idle sky: a real constellation, faintly drawn, so the cabinet reads as a
-       night sky rather than an empty box before anyone presses Start. */
-    (function idle() {
-      var shape = SHAPES[1];                       // Cassiopeia's W
-      points = buildField(shape, 9);
-      render();
-      sky.classList.add('locked');
-      shape.stars.forEach(function (_, k) {
-        if (k > 0) drawLine(k - 1, k, true);
+    var chain = winner ? chainOf(winner) : [];
+    var dim = chain.length > 0;
+    for (k = 0; k < n * n; k++) {
+      if (!cells[k]) continue;
+      var pt = centre(k);
+      var faded = dim && chain.indexOf(k) < 0;
+      s += '<circle class="stone' + (k === last && !dim ? " fresh" : "") + '" cx="' + pt[0].toFixed(1) +
+        '" cy="' + pt[1].toFixed(1) + '" r="' + (W * .335).toFixed(1) + '" fill="' + colourOf(cells[k]) +
+        '" opacity="' + (faded ? ".22" : "1") + '"/>';
+      if (k === last && !dim) {
+        s += '<circle cx="' + pt[0].toFixed(1) + '" cy="' + pt[1].toFixed(1) + '" r="' +
+          (W * .335 + 3.5).toFixed(1) + '" fill="none" stroke="rgba(255,255,255,.38)" stroke-width="1"/>';
+      }
+    }
+
+    if (chain.length > 1) {
+      var pts = [];
+      for (i = 0; i < chain.length; i++) pts.push(centre(chain[i]));
+      var d = "", len = 0;
+      for (i = 0; i < pts.length; i++) {
+        d += (i ? "L" : "M") + pts[i][0].toFixed(1) + " " + pts[i][1].toFixed(1) + " ";
+        if (i) len += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+      }
+      s += '<path class="trace" style="--len:' + len.toFixed(0) + '" d="' + d.trim() + '"/>';
+      for (i = 0; i < pts.length; i++) {
+        s += '<circle cx="' + pts[i][0].toFixed(1) + '" cy="' + pts[i][1].toFixed(1) +
+          '" r="2.4" fill="#fff" opacity=".9"/>';
+      }
+    }
+
+    boardEl.innerHTML = s;
+    stage.style.width = w + "px";
+    stage.style.height = h + "px";
+  }
+
+  /* ---------------- chrome ---------------- */
+
+  function say(text, tone) {
+    statusEl.textContent = text;
+    statusEl.setAttribute("data-tone", tone || "accent");
+  }
+
+  function recordKey() { return "hex.rec." + mode + "." + n; }
+  function readRecord() {
+    var raw = store.get(recordKey());
+    if (!raw) return { w: 0, l: 0 };
+    var p = raw.split(",");
+    return { w: parseInt(p[0], 10) || 0, l: parseInt(p[1], 10) || 0 };
+  }
+  function showRecord() {
+    if (mode === "duo") { recordEl.innerHTML = '<span style="color:rgba(255,255,255,.28)">pass the device</span>'; return; }
+    var rec = readRecord();
+    recordEl.innerHTML = (rec.w + rec.l) === 0
+      ? '<span style="color:rgba(255,255,255,.28)">no games yet at ' + n + "\u00d7" + n + "</span>"
+      : n + "\u00d7" + n + " \u00b7 you <b>" + rec.w + "</b> \u2014 <i>" + rec.l + "</i> machine";
+  }
+  function bumpRecord(won) {
+    if (mode === "duo") return;
+    var rec = readRecord();
+    if (won) rec.w++; else rec.l++;
+    store.set(recordKey(), rec.w + "," + rec.l);
+    showRecord();
+  }
+
+  function showLegend() {
+    var verb = mode === "reverse" ? "must not link" : "links";
+    var one = mode === "duo" ? "player one" : "you";
+    var two = mode === "duo" ? "player two" : "machine";
+    legendEl.innerHTML =
+      '<span><span class="dot" style="background:#b0a8e6"></span>' + one + " " + verb + " left to right</span>" +
+      '<span><span class="dot" style="background:#7ec8d8"></span>' + two + " " + verb + " top to bottom</span>";
+    document.getElementById("g-level").className = "group" + (mode === "duo" ? " off" : "");
+  }
+
+  /* ---------------- flow ---------------- */
+
+  function snapshot() {
+    history.push({ cells: cells.slice(), moveCount: moveCount, last: last, turn: turn });
+    if (history.length > 60) history.shift();
+  }
+
+  function reset() {
+    cells = new Int8Array(n * n);
+    buf = new Int8Array(n * n);
+    seen = new Uint8Array(n * n);
+    stack = new Int32Array(n * n);
+    shuf = new Int32Array(n * n);
+    empties = [];
+    history = [];
+    moveCount = 0;
+    turn = YOU;
+    over = false; busy = false; winner = 0; last = -1;
+    buildTopology();
+    measure();
+    seedStars();
+    paintStars();
+    paint();
+    showRecord();
+    showLegend();
+    say(mode === "duo" ? "player one" : "your move");
+  }
+
+  function resolve(player) {
+    over = true; busy = false; winner = player;
+    paint();
+    /* In reverse, completing a chain is how you lose. */
+    var firstSideWon = mode === "reverse" ? player !== YOU : player === YOU;
+    if (mode === "duo") {
+      say(firstSideWon ? "player one wins" : "player two wins", firstSideWon ? "accent" : "rival");
+      return;
+    }
+    say(firstSideWon ? "you win" : "machine wins", firstSideWon ? "accent" : "rival");
+    bumpRecord(firstSideWon);
+  }
+
+  function machineTurn() {
+    busy = true;
+    paint();
+    say("thinking\u2026", "quiet");
+
+    if (mode === "classic" && moveCount === 1) {
+      setTimeout(function () {
+        if (evaluate(220) < 0.46) {
+          var k = last, r = (k / n) | 0, c = k % n;
+          cells[k] = 0;
+          cells[c * n + r] = RIVAL;
+          last = c * n + r;
+          moveCount++;
+          busy = false; turn = YOU;
+          paint();
+          say("machine swapped \u2014 your move");
+          return;
+        }
+        go();
+      }, 40);
+      return;
+    }
+    go();
+
+    function go() {
+      think(LEVELS[level].budget, function (move) {
+        if (move < 0) { busy = false; paint(); say("board is full", "quiet"); return; }
+        cells[move] = RIVAL;
+        last = move;
+        moveCount++;
+        if (connected(cells, RIVAL)) { resolve(RIVAL); return; }
+        busy = false; turn = YOU;
+        paint();
+        say("your move");
       });
-    })();
-  })();
+    }
+  }
 
-  window.addEventListener('load', function () {
-    requestAnimationFrame(function () {
-      document.querySelector('.page').classList.add('in');
-    });
+  function place(k) {
+    if (over || busy || cells[k]) return;
+    snapshot();
+    var mover = turn;
+    cells[k] = mover;
+    last = k;
+    moveCount++;
+    if (connected(cells, mover)) { resolve(mover); return; }
+
+    if (mode === "duo") {
+      turn = mover === YOU ? RIVAL : YOU;
+      paint();
+      say(turn === YOU ? "player one" : "player two", turn === YOU ? "accent" : "rival");
+      return;
+    }
+    paint();
+    machineTurn();
+  }
+
+  boardEl.addEventListener("click", function (ev) {
+    var t = ev.target;
+    if (!t.dataset || t.dataset.k === undefined) return;
+    place(parseInt(t.dataset.k, 10));
   });
-  </script>
+
+  boardEl.addEventListener("keydown", function (ev) {
+    var t = ev.target;
+    if (!t.dataset || t.dataset.k === undefined) return;
+    var k = parseInt(t.dataset.k, 10), r = (k / n) | 0, c = k % n;
+    if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); place(k); return; }
+    if (ev.key === "ArrowLeft") c--;
+    else if (ev.key === "ArrowRight") c++;
+    else if (ev.key === "ArrowUp") r--;
+    else if (ev.key === "ArrowDown") r++;
+    else return;
+    ev.preventDefault();
+    if (r < 0 || r >= n || c < 0 || c >= n) return;
+    var next = boardEl.querySelector('[data-k="' + (r * n + c) + '"]');
+    if (next) next.focus();
+  });
+
+  document.getElementById("btn-new").addEventListener("click", function () { if (!busy) reset(); });
+
+  document.getElementById("btn-undo").addEventListener("click", function () {
+    if (busy || !history.length) return;
+    var prev = history.pop();
+    cells.set(prev.cells);
+    moveCount = prev.moveCount;
+    last = prev.last;
+    turn = prev.turn;
+    over = false; winner = 0;
+    paint();
+    say("took that back");
+  });
+
+  var linkBtn = document.getElementById("btn-links");
+  linkBtn.setAttribute("aria-pressed", showLinks ? "true" : "false");
+  linkBtn.addEventListener("click", function () {
+    showLinks = !showLinks;
+    store.set("hex.links", showLinks ? "1" : "0");
+    linkBtn.setAttribute("aria-pressed", showLinks ? "true" : "false");
+    paint();
+  });
+
+  function chips(host, items, current, onPick) {
+    host.innerHTML = "";
+    items.forEach(function (item, i) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.textContent = item.label;
+      b.setAttribute("aria-pressed", i === current ? "true" : "false");
+      b.addEventListener("click", function () {
+        if (busy) return;
+        [].forEach.call(host.children, function (x) { x.setAttribute("aria-pressed", "false"); });
+        b.setAttribute("aria-pressed", "true");
+        onPick(i);
+      });
+      host.appendChild(b);
+    });
+  }
+
+  chips(document.getElementById("modes"), MODES,
+    MODES.map(function (m) { return m.id; }).indexOf(mode),
+    function (i) { mode = MODES[i].id; store.set("hex.mode", mode); reset(); });
+
+  chips(document.getElementById("sizes"),
+    SIZES.map(function (s) { return { label: s + "\u00d7" + s }; }),
+    SIZES.indexOf(n),
+    function (i) { n = SIZES[i]; store.set("hex.size", n); reset(); });
+
+  chips(document.getElementById("levels"), LEVELS, level,
+    function (i) { level = i; store.set("hex.level", i); });
+
+  var rt;
+  window.addEventListener("resize", function () {
+    clearTimeout(rt);
+    rt = setTimeout(function () { measure(); seedStars(); paintStars(); paint(); }, 150);
+  });
+
+  reset();
+})();
+</script>
+
 </body>
 </html>
